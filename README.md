@@ -1,16 +1,17 @@
-## Hi there 👋
+# 👋 Hi, I'm Kip!
 
-<!--
-**Kipung/Kipung** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+I'm a student at **California Baptist University**, majoring in **Computer Science** and minoring in **Christian Studies**. I enjoy exploring topics like **computational simulations**, **AI/ML**, and **Software Engineering**.
 
-Here are some ideas to get you started:
+- 📚 **Teaching Assistant** for Physics, where I grade labs and offer feedback.
+- 💻 **Software Engineering Tutor**, helping students deepen their coding and design skills.
+- 🏆 **ICPC** team member, competing in the **International Collegiate Programming Contest**.
+- 👨‍💻 Active in the **ACM Student Chapter**, participating in the **Software Engineering Team (SET)** as a team lead and contributing to the club's growth.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+
+## 🔧 Technical Interests:
+- Computational Simulations
+- Graphics and Light Simulations
+- Software Engineering
+- AI and AGI
+
+Feel free to connect or explore my repositories. Let’s code something amazing! 🚀
