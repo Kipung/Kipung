@@ -22,7 +22,7 @@ I'm passionate about integrating **Christian principles** into my work, and love
 - **Languages**: Python, C++, Java, HTML, CSS, JavaScript
 - **Frameworks**: Django
 - **Libraries/Tools**: NumPy, Matplotlib, Pygame
-- **Concepts**: Machine Learning, Neural Networks, Software Architecture
+
 
 
 ## 🎯 Fun Facts:
