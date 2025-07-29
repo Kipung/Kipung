@@ -1,32 +1,40 @@
 # 👋 Hi, I'm Kip!
 
-I'm a **Computer Science** student at **California Baptist University**, with a minor in **Christian Studies**. My passion lies in technical fields such as **Artificial Intelligence**, **Software Engineering**, and **Computational Simulations**, all grounded in my faith and exploring how they come together.
+I'm a **Computer Science** student at **California Baptist University** with a minor in **Christian Studies**. I’m passionate about building impactful software and researching the frontiers of **AI**, **LLMs**, and **computational systems** — all grounded in my faith and curiosity about the world.
 
-- 📚 **Teaching Assistant** for Physics, where I grade labs and offer feedback.
-- 💻 **Software Engineering Tutor**, helping students deepen their coding and design skills.
-- 🏆 **ICPC** team member, competing in the **International Collegiate Programming Contest**.
-- 👨‍💻 **Lead of the Software Engineering Team (SET)**, part of the **ACM Student Chapter**, guiding projects and contributing to the club's growth.
-- 🔬 **Student Researcher** for Dr. Choi, focusing on innovative **physics simulations**, including how light bend by gravitational effects.
+- 🎓 **Deep Learning Researcher** — Co-author of an upcoming paper on **geospatial AI** for opioid overdose prediction (AMCIS 2025).
+- 🤖 **AI Agent Builder** — Currently developing a **Degree Planning Guide** powered by **LangChain**, **Neo4j**, and **LLMs** in collaboration with CBU’s **Office of Student Success**.
+- 👨‍🏫 **Software Engineering Tutor** — Mentoring over 80 students in Java and full-stack development.
+- 👨‍💻 **Lead of the Software Engineering Team (SET)** at CBU’s **ACM Chapter** — Delivering full-stack apps and GenAI projects as part of a team-focused, agile workflow.
+- 🧠 **Algoverse AI Research Fellow (Summer–Fall 2025)** — Researching LLMs and contributing to open-source projects.
 
-I'm passionate about integrating **Christian principles** into my work, and love collaborating with people from diverse backgrounds.
+I'm driven by a desire to build systems that serve others — from internal tools to research that matters — while exploring how technology intersects with faith and ethics.
+
+---
 
 ## 🔧 Technical Interests:
 
-- **Artificial Intelligence and AGI**
-- **Software Engineering & Cybersecurity**
-- **Computational Simulations**
-- **Graphics and Light Simulations**
+- **Large Language Models (LLMs) and AI Agents**
+- **Graph RAG & Semantic Search**
+- **Software Engineering & Backend Development**
+- **AI-Driven Student Success Tools**
+
+---
 
 ## 🛠️ Skills:
 
-- **Languages**: Python, C++, Java, HTML, CSS, JavaScript
-- **Frameworks**: Django
-- **Libraries/Tools**: NumPy, Matplotlib, Pygame
+- **Programming Languages**: Python, Java, C++, JavaScript, HTML (language?), CSS  
+- **Frameworks**: FastAPI, Django, React  
+- **Tools/Libraries**: LangChain, Neo4j, PostgreSQL, Docker, NumPy, Matplotlib, Pygame  
+- **Other**: Git, VS Code, PyCharm, OpenAI, Ollama, Kepler.gl
 
-
+---
 
 ## 🎯 Fun Facts:
 
-- Teaching and mentoring are among my greatest joys, especially helping others grow in programming.
+- I love teaching — mentoring and helping others grow technically is one of the most fulfilling parts of my journey.
+- I love playing basketball — especially one-on-ones.
 
-Feel free to connect or explore my repositories. Let’s code something amazing! 🚀
+---
+
+Let’s build something meaningful together. 🚀
