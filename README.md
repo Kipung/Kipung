@@ -1,40 +1,55 @@
-# 👋 Hi, I'm Kip!
+# 👋 Hi, I’m Kip Park
 
-I'm a **Computer Science** student at **California Baptist University** with a minor in **Christian Studies**. I’m passionate about building impactful software and researching the frontiers of **AI**, **LLMs**, and **computational systems** — all grounded in my faith and curiosity about the world.
-
-- 🎓 **Deep Learning Researcher** — Co-author of an upcoming paper on **geospatial AI** for opioid overdose prediction (AMCIS 2025).
-- 🤖 **AI Agent Builder** — Currently developing a **Degree Planning Guide** powered by **LangChain**, **Neo4j**, and **LLMs** in collaboration with CBU’s **Office of Student Success**.
-- 👨‍🏫 **Software Engineering Tutor** — Mentoring over 80 students in Java and full-stack development.
-- 👨‍💻 **Lead of the Software Engineering Team (SET)** at CBU’s **ACM Chapter** — Delivering full-stack apps and GenAI projects as part of a team-focused, agile workflow.
-- 🧠 **Algoverse AI Research Fellow (Summer–Fall 2025)** — Researching LLMs and contributing to open-source projects.
-
-I'm driven by a desire to build systems that serve others — from internal tools to research that matters — while exploring how technology intersects with faith and ethics.
+I’m a **Computer Science student** at **California Baptist University** focused on **AI Research** and **applied AI/ML systems**. I enjoy building production-adjacent tools, exploring how modern LLMs work under the hood, and leading technical teams to ship useful software.
 
 ---
 
-## 🔧 Technical Interests:
+## 🔍 What I’m Working On
 
-- **Large Language Models (LLMs) and AI Agents**
-- **Graph RAG & Semantic Search**
-- **Software Engineering & Backend Development**
-- **AI-Driven Student Success Tools**
+- 🎓 **AI Engineering Intern — Office of Student Success (CBU)**  
+  Building AI-powered internal tools for academic advising and the university registrar, including:
+  - LLM-assisted drafting and policy retrieval
+  - A graph-based degree planning system using **Neo4j**, **LangChain**, and **FastAPI**
+  - A **Whisper-based transcription and note-generation prototype** to reduce manual advising overhead
 
----
+- 👨‍💻 **President, ACM @ CBU**  
+  Founded and lead the **Software Engineering Team (SET)**, coordinating multi-semester engineering efforts including:
+  - A web-based ACM website prototype
+  - **GUTT (Ground Up Trained Transformer)** — a team effort studying and prototyping transformer components by working through  
+    *Build a Large Language Model (From Scratch)* by Sebastian Raschka
 
-## 🛠️ Skills:
+- 🧠 **Research Experience**  
+  Co-author on a **GeoAI-based overdose risk prediction** paper (AMCIS 2025) and prior work in **mechanistic interpretability**, including transformer analysis and sparse autoencoders.
 
-- **Programming Languages**: Python, Java, C++, JavaScript, HTML (language?), CSS  
-- **Frameworks**: FastAPI, Django, React  
-- **Tools/Libraries**: LangChain, Neo4j, PostgreSQL, Docker, NumPy, Matplotlib, Pygame  
-- **Other**: Git, VS Code, PyCharm, OpenAI, Ollama, Kepler.gl
-
----
-
-## 🎯 Fun Facts:
-
-- I love teaching — mentoring and helping others grow technically is one of the most fulfilling parts of my journey.
-- I love playing basketball — especially one-on-ones.
+- 👨‍🏫 **Software Engineering Tutor**  
+  Supporting 80+ students in **Java-based software engineering and data structures**, including debugging, code reviews, and exam review support.
 
 ---
 
-Let’s build something meaningful together. 🚀
+## 🛠️ Technical Skills
+
+**Languages**  
+Python, Java, C++, JavaScript
+
+**ML / AI**  
+PyTorch, JAX, TransformerLens, Sparse Autoencoders, LoRA, LangChain, Open-Source LLMs
+
+**Backend / Data**  
+FastAPI, Neo4j, PostgreSQL, MySQL, Docker
+
+**Tools**  
+Git, VS Code, PyCharm, IntelliJ
+
+---
+
+## 🚀 Interests
+
+- Large Language Models & AI agents  
+- Physical AI  
+- Software engineering for real-world systems  
+- AI-driven tools for student success and education
+
+---
+
+I care about building systems that are **useful, understandable, and responsibly designed**.  
+If you’re interested in collaborating, feel free to reach out.
