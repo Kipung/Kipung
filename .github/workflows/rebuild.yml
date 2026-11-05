@@ -1,0 +1,29 @@
+name: rebuild
+
+# Redraws the artwork and README so dated parts (the timeline's "now", the next event,
+# the year) stay current. Runs monthly and whenever the generator or its data change.
+on:
+  schedule:
+    - cron: '0 8 1 * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/**', 'assets/src/**']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - run: python3 scripts/build.py
+      - name: Commit if anything changed
+        run: |
+          git add -A assets README.md
+          git diff --cached --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Rebuild profile artwork"
+          git push

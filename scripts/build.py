@@ -12,6 +12,7 @@ Needs ffmpeg for resizing the embedded photographs.
 import base64
 import subprocess
 import textwrap
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -35,10 +36,17 @@ ABSTRACT = [
     "source-verified fine-tuning pipelines, run controlled LLM experiments,",
     "and ship local-first AI tools that people actually use.",
 ]
+TODAY = date.today()
+# The hero shows the first event that has not happened yet; past ones drop off on the
+# monthly rebuild (.github/workflows/rebuild.yml). Add new ones here.
+EVENTS = [
+    (date(2026, 11, 21), "2 posters · SCCUR, Nov. 21"),
+]
+upcoming = [text for day, text in EVENTS if day >= TODAY]
 FACTS = [
     ("Study", "B.S. CS, ML & AI · Apr. 2027"),
     ("Lab", "CBU AI & ML Lab (CAIMLL)"),
-    ("Next", "2 posters · SCCUR, Nov. 21"),
+    ("Next", upcoming[0]) if upcoming else ("Focus", "LLM fine-tuning & evaluation"),
 ]
 
 # Large figure cards, in reading order. image = file in assets/src, or "draw:<name>".
@@ -50,8 +58,8 @@ FIGURES = [
      "desc": "Reference documents become source-verified training data, checked for evidence coverage, answer quality and reproducibility.",
      "tags": "QLoRA · Unsloth · vLLM · GGUF · evaluation"},
     {"slug": "subliminal", "title": "Subliminal Learning in LLMs", "meta": "Study lead · under review", "image": "subliminal-teacher.jpg", "fit": "meet",
-     "desc": "Can a teacher’s hidden love of owls reach a student through filtered number sequences? A controlled test with LoRA and system-prompt teachers.",
-     "tags": "Llama 3.2 3B · LoRA · system prompts", "href": "https://github.com/kipung/CSC422_Subliminal_Learning"},
+     "desc": "Can a hidden love of owls pass from teacher to student through number sequences? The teacher picked owls 53% of the time; students barely moved.",
+     "tags": "Llama 3.2 3B · LoRA · system prompts", "href": "https://github.com/kipung/WeHateOwls"},
     {"slug": "geoai", "title": "GeoAI: Overdose Risk Mapping", "meta": "AMCIS 2025 · coauthor", "image": "geoai.jpg",
      "desc": "A deep model predicts areas of suspected drug-overdose risk from geolocated posts; Kepler.gl maps turn its output into regional insight.",
      "tags": "deep learning · GIS · Kepler.gl", "href": "https://aisel.aisnet.org/amcis2025/intelfuture/intelfuture/27/"},
@@ -79,8 +87,9 @@ MINIS = [
      "href": "https://github.com/kipung/ffn_relu_vs_geglu_mnist"},
     {"slug": "voice", "title": "Local Voice Assistant", "meta": "Offline · Ollama", "image": "voice.jpg", "fit": "meet",
      "desc": "Speech in, local Llama 3.2 out, spoken back; nothing leaves the machine."},
-    {"slug": "lensing", "title": "Gravitational Lensing", "meta": "Computational physics", "image": "lensing.jpg",
-     "desc": "Object-oriented ray-tracing of light bending around rows of masses."},
+    {"slug": "baymin", "title": "BAY-min", "meta": "Reachy Mini · Gemini Live", "image": "reachy.jpg",
+     "desc": "A robot math tutor that talks, watches the student’s work, and nods along.",
+     "href": "https://github.com/kipung/BAY-min_personal_tutor"},
     {"slug": "campusmate", "title": "CampusMate", "meta": "Flutter · Firebase", "image": "campusmate.jpg",
      "desc": "Study groups, real-time messaging, file sharing and a group calendar for students.",
      "href": "https://github.com/kipung/campusmate"},
@@ -102,7 +111,7 @@ PLATES = [
 ]
 
 # Timeline rows: (lane, label, start, end); end None = ongoing. Months as (year, month).
-NOW = (2026, 11)
+NOW = (TODAY.year, TODAY.month)
 TIMELINE = [
     ("research", "GeoAI for public health", (2024, 3), (2025, 9)),
     ("research", "Computational physics, lensing", (2024, 5), (2025, 8)),
@@ -123,6 +132,8 @@ MILESTONES = [
 REPOS = [
     {"repo": "living-kanto", "fig": "kanto"},
     {"repo": "CSC422_Subliminal_Learning", "fig": "subliminal"},
+    {"repo": "WeHateOwls", "fig": "subliminal"},
+    {"repo": "BAY-min_personal_tutor", "mini": "baymin", "tags": "Reachy Mini · Gemini Live · OpenCV · Firestore · BLE"},
     {"repo": "degree_planning_guide", "fig": "degree"},
     {"repo": "terminal-browser", "fig": "browser"},
     {"repo": "SET_PROJECT_3", "fig": "acm"},
@@ -263,7 +274,8 @@ def plate(pl, t):
 def timeline(t):
     W = 1000
     lx, rx = 300, W - 10
-    start, end = (2024, 1), (2027, 6)
+    start = (2024, 1)
+    end = max((2027, 6), (NOW[0] + (NOW[1] + 6 - 1) // 12, (NOW[1] + 6 - 1) % 12 + 1))
     mi = lambda ym: (ym[0] - start[0]) * 12 + ym[1] - 1
     span = mi(end)
     X = lambda ym: lx + (rx - lx) * mi(ym) / span
@@ -272,7 +284,7 @@ def timeline(t):
     lane_color = {"research": t["accent"], "work": t["ink"], "lead": t["dim"]}
     out = [f'<text x="0" y="24" class="s ink" font-size="20"><tspan class="acc" font-weight="700">Fig. 9.</tspan> <tspan font-style="italic">Research, work and leadership, 2024 to now.</tspan></text>',
            f'<rect x="0" y="36" width="{W}" height="1" fill="{t["rule"]}"/>']
-    for yr in range(2024, 2028):
+    for yr in range(2024, end[0] + 1):
         x = X((yr, 1))
         out.append(f'<rect x="{x:.1f}" y="{top - 14}" width="1" height="{len(TIMELINE) * row_h + 14}" fill="{t["rule"]}"/>'
                    f'<text x="{x + 5:.1f}" y="{top - 4}" class="m dim" font-size="11">{yr}</text>')
@@ -331,7 +343,7 @@ def hero(t):
   .ln {{ fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 9s .4s ease-out infinite; }}
 </style>
 <text x="48" y="40" class="m cap ink">Park, K.-P. · California Baptist University</text>
-<text x="{W - 48}" y="40" class="m cap dim" text-anchor="end">Riverside, CA · 2026</text>
+<text x="{W - 48}" y="40" class="m cap dim" text-anchor="end">Riverside, CA · {TODAY.year}</text>
 <rect x="48" y="54" width="{W - 96}" height="1" fill="{t['ink']}"/><rect x="48" y="58" width="{W - 96}" height="1" fill="{t['ink']}"/>
 <text x="46" y="158" class="s ink r1" font-size="64" letter-spacing="-1">{escape(NAME)}</text>
 <text x="48" y="204" class="s acc r2" font-size="22" font-style="italic">{escape(SUBTITLE)}</text>
@@ -349,6 +361,24 @@ def hero(t):
 <rect x="48" y="{H - 84}" width="{W - 96}" height="1" fill="{t['rule']}"/>
 {facts}"""
     return svg(W, H, f"{NAME}. {SUBTITLE}", t, body)
+
+
+def picture_md(stem, alt, width="100%"):
+    return (f'<picture><source media="(prefers-color-scheme: dark)" srcset="assets/{stem}-dark.svg">'
+            f'<img src="assets/{stem}-light.svg" width="{width}" alt="{escape(alt, {chr(34): "&quot;"})}"></picture>')
+
+
+def readme():
+    link = lambda href, inner: f'<a href="{href}">{inner}</a>' if href else inner
+    figs = "\n".join(link(p.get("href"), picture_md(f"fig-{p['slug']}", f"Fig. {i}. {p['title']}: {p['desc']}"))
+                     for i, p in enumerate(FIGURES, 1))
+    minis = [link(p.get("href"), picture_md(f"mini-{p['slug']}", f"{p['title']}: {p['desc']}", "49%")) for p in MINIS]
+    mini_rows = "\n\n".join("<p>\n" + "\n".join(minis[i:i + 2]) + "\n</p>" for i in range(0, len(minis), 2))
+    plates = "\n\n".join(picture_md(f"plate-{pl['slug']}", f"{pl['title']}: " + "; ".join(f"{a}, {c}" for _, a, c, _ in pl["photos"]))
+                          for pl in PLATES)
+    return (ROOT / "scripts" / "README.template.md").read_text(encoding="utf-8").format(
+        hero=picture_md("hero", f"{NAME}. {SUBTITLE}"), figures=figs, minis=mini_rows, plates=plates,
+        timeline=picture_md("timeline", "Fig. 9. Timeline of research, work and leadership from 2024 to now."))
 
 
 def write(path, text):
@@ -372,4 +402,5 @@ if __name__ == "__main__":
             p["tags"] = r.get("tags") or p["tags"]
             write(REPO_OUT / r["repo"] / ".github" / f"banner-{name}.svg",
                   card(p, None, False, t, header=(f"kipung / {r['repo']}", p["meta"])))
+    write(ROOT / "README.md", readme())
     print("wrote", len(list(OUT.glob("*.svg"))), "profile SVGs and", len(REPOS) * 2, "repo banners")
