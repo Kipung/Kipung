@@ -80,6 +80,8 @@
 
 </details>
 
+## Experience
+
 <picture><source media="(max-width: 640px)" srcset="assets/timeline-m.svg"><img src="assets/timeline.svg" width="100%" alt="Experience: research, work and leadership from 2024 to now."></picture>
 
 ## Publications & talks

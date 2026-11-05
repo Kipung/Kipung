@@ -193,7 +193,8 @@ def text(x, y, s, size, cls="s ink", weight=None, extra=""):
 def para(x, y, s, size, maxw, lh, cls="s ink", weight=None):
     """Wrapped text. Returns (svg, y below the last line)."""
     kind = "b" if weight else ("m" if "m" in cls.split() else "s")
-    rows = textwrap.wrap(s, max(1, int(maxw / char_w(size, kind))))
+    # textwrap breaks on no-break spaces too, so hide them while wrapping.
+    rows = [r.replace("\x00", "\u00a0") for r in textwrap.wrap(s.replace("\u00a0", "\x00"), max(1, int(maxw / char_w(size, kind))))]
     out = "".join(text(x, y + size * 0.95 + i * lh, row, size, cls, weight) for i, row in enumerate(rows))
     return out, y + len(rows) * lh
 
@@ -461,8 +462,7 @@ def timeline():
     row_h, top = 30, 96
     bottom = top + len(TIMELINE) * row_h
     H = bottom + 120
-    out = [text(pad, pad + 16, "Experience", 18, "s ink", 600),
-           text(pad + 110, pad + 16, "research, work and leadership", 12, "m dim")]
+    out = [text(pad, pad + 16, "research, work and leadership", 12, "m dim")]
     for yr in range(2024, end[0] + 1):
         x = X((yr, 1))
         out.append(f'<rect x="{x:.1f}" y="{top - 14}" width="1" height="{bottom - top + 14}" fill="{GRID}"/>'
@@ -501,8 +501,7 @@ def timeline_m():
     X = lambda ym: pad + (W - 2 * pad) * mi(ym) / span
     row_h, top = 50, 100
     bottom = top + len(TIMELINE) * row_h
-    out = [text(pad, pad + 18, "Experience", 22, "s ink", 600),
-           text(pad, pad + 40, "research, work and leadership", 13, "m dim")]
+    out = [text(pad, pad + 18, "research, work and leadership", 13, "m dim")]
     for yr in range(2024, end[0] + 1):
         x = X((yr, 1))
         out.append(f'<rect x="{x:.1f}" y="{top - 12}" width="1" height="{bottom - top + 12}" fill="{GRID}"/>'
