@@ -35,13 +35,6 @@
 
 {projects}
 
-<table>
-  <tr>
-    <td width="50%"><img src="assets/demos/lensing.gif" width="100%" alt="Gravitational lensing simulation: light rays bend as they reach rows of masses"></td>
-    <td width="50%"><b>Gravitational lensing</b><br>A physics research simulation of light rays bending around rows of masses.</td>
-  </tr>
-</table>
-
 ## Photos
 
 <details>
@@ -50,8 +43,6 @@
 {photos}
 
 </details>
-
-## Experience
 
 {timeline}
 

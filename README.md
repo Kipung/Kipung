@@ -41,36 +41,33 @@
 </p>
 
 <p>
-<picture><source media="(max-width: 640px)" srcset="assets/proj-hydro-m.svg"><img src="assets/proj-hydro.svg" width="49%" alt="Rainfall Transfer Between Gauges: Hourly rainfall from one gauge estimated from another across 28 years of records; held-out event hours reach R² = 0.58."></picture>
-<a href="https://github.com/kipung/SET_PROJECT_3"><picture><source media="(max-width: 640px)" srcset="assets/proj-acm-m.svg"><img src="assets/proj-acm.svg" width="49%" alt="CBU ACM Website: Built by the Software Engineering Team I founded, with Brandon Magana and the SET crew, using Scrum and GitHub flow."></picture></a>
+<picture><source media="(max-width: 640px)" srcset="assets/proj-hydro-m.svg"><img src="assets/proj-hydro.svg" width="49%" alt="Rainfall Transfer Between Gauges: Hourly rainfall from one gauge estimated from another across 28 years of records; held-out event hours reach R² = 0.58."></picture>
+<picture><source media="(max-width: 640px)" srcset="assets/proj-lensing-m.svg"><img src="assets/proj-lensing.svg" width="49%" alt="Gravitational Lensing: A simulation of light rays bending as they pass rows of masses."></picture>
 </p>
 
 <details>
-<summary><b>6 more projects</b></summary>
+<summary><b>7 more projects</b></summary>
 
 <p>
+<a href="https://github.com/kipung/SET_PROJECT_3"><picture><source media="(max-width: 640px)" srcset="assets/proj-acm-m.svg"><img src="assets/proj-acm.svg" width="49%" alt="CBU ACM Website: Built by the Software Engineering Team I founded, with Brandon Magana and the SET crew, using Scrum and GitHub flow."></picture></a>
 <a href="https://github.com/kipung/tracr_to_transformer_lens_generalize"><picture><source media="(max-width: 640px)" srcset="assets/proj-tracr-m.svg"><img src="assets/proj-tracr.svg" width="49%" alt="Tracr → TransformerLens: Compile a RASP program with Tracr, convert it to TransformerLens, check both decode alike."></picture></a>
+</p>
+
+<p>
 <a href="https://github.com/kipung/ffn_relu_vs_geglu_mnist"><picture><source media="(max-width: 640px)" srcset="assets/proj-geglu-m.svg"><img src="assets/proj-geglu.svg" width="49%" alt="GeGLU vs ReLU: Feed-forward activations compared across widths, with bootstrap confidence intervals."></picture></a>
-</p>
-
-<p>
 <picture><source media="(max-width: 640px)" srcset="assets/proj-voice-m.svg"><img src="assets/proj-voice.svg" width="49%" alt="Local Voice Assistant: Speech in, local Llama 3.2 out, spoken back; nothing leaves the machine."></picture>
-<a href="https://github.com/kipung/BAY-min_personal_tutor"><picture><source media="(max-width: 640px)" srcset="assets/proj-baymin-m.svg"><img src="assets/proj-baymin.svg" width="49%" alt="BAY-min: A robot math tutor that talks, watches the student’s work, and nods along."></picture></a>
 </p>
 
 <p>
+<a href="https://github.com/kipung/BAY-min_personal_tutor"><picture><source media="(max-width: 640px)" srcset="assets/proj-baymin-m.svg"><img src="assets/proj-baymin.svg" width="49%" alt="BAY-min: A robot math tutor that talks, watches the student’s work, and nods along."></picture></a>
 <a href="https://github.com/kipung/campusmate"><picture><source media="(max-width: 640px)" srcset="assets/proj-campusmate-m.svg"><img src="assets/proj-campusmate.svg" width="49%" alt="CampusMate: Study groups, real-time messaging, file sharing and a group calendar for students."></picture></a>
+</p>
+
+<p>
 <a href="https://github.com/kipung/functiongemma-hackathon"><picture><source media="(max-width: 640px)" srcset="assets/proj-hackathon-m.svg"><img src="assets/proj-hackathon.svg" width="49%" alt="FunctionGemma Hackathon: 3rd place in the online division of the Cactus × Google DeepMind FunctionGemma Hackathon."></picture></a>
 </p>
 
 </details>
-
-<table>
-  <tr>
-    <td width="50%"><img src="assets/demos/lensing.gif" width="100%" alt="Gravitational lensing simulation: light rays bend as they reach rows of masses"></td>
-    <td width="50%"><b>Gravitational lensing</b><br>A physics research simulation of light rays bending around rows of masses.</td>
-  </tr>
-</table>
 
 ## Photos
 
@@ -82,8 +79,6 @@
 <picture><source media="(max-width: 640px)" srcset="assets/photos-bench-m.svg"><img src="assets/photos-bench.svg" width="100%" alt="Robots &amp; hardware: SO-101 arm, Physical AI capstone: assembly and teleoperation; Reachy Mini, Assembled and demoed for visiting students; Jetson Orin Nano Super, A fully local AI assistant on the edge"></picture>
 
 </details>
-
-## Experience
 
 <picture><source media="(max-width: 640px)" srcset="assets/timeline-m.svg"><img src="assets/timeline.svg" width="100%" alt="Experience: research, work and leadership from 2024 to now."></picture>
 
