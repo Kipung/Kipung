@@ -30,7 +30,7 @@ MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monosp
 
 NAME = "Kip Park"
 FULL_NAME = "Ki-Pung Park"
-TAGLINE = "I fine-tune, evaluate and run language models locally."
+TAGLINE = "AI researcher and engineer, focused on language models."
 ABOUT = ("CS (ML & AI, ’27) at California Baptist University. I build fine-tuning pipelines, "
          "run LLM experiments and ship local-first AI tools.")
 TODAY = date.today()
