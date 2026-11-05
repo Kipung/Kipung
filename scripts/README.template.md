@@ -26,12 +26,12 @@
 <table>
   <tr>
     <td width="33%"><a href="https://github.com/kipung/living-kanto"><img src="assets/demos/kanto.gif" width="100%" alt="Living Kanto replay: residents walk through town, each deciding where to go next"></a></td>
-    <td width="34%"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="terminal-browser: an agent in a Ghostty pane reads, restyles, fills in and clicks a page in the browser split beside it"></a></td>
+    <td width="34%"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="Claude Code gets a plain-English request, edits the page, then reloads, fills in and clicks it in the terminal-browser split beside it"></a></td>
     <td width="33%"><img src="assets/demos/lensing.gif" width="100%" alt="Gravitational lensing simulation: light rays bend as they reach rows of masses"></td>
   </tr>
   <tr>
     <td align="center"><sub><b>Living Kanto</b> · 100 local-LLM residents</sub></td>
-    <td align="center"><sub><b>Terminal Browser</b> · an agent drives a live page</sub></td>
+    <td align="center"><sub><b>Terminal Browser</b> · Claude Code drives a live page</sub></td>
     <td align="center"><sub><b>Gravitational lensing</b> · physics research</sub></td>
   </tr>
 </table>
