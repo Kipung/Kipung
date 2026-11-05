@@ -1,15 +1,16 @@
 """Render the profile artwork, and the banners for the featured repos, from the data below.
 
-The profile reads like a paper: a title page, numbered figures with captions, plates of
-photographs, and a timeline. Serif type, one cobalt accent, hairline rules, light and dark.
-GitHub shows SVGs as images, so only system fonts render, motion is CSS inside the file,
-and photographs are embedded as data URIs (sources in assets/src/).
+The profile is a stack of dark product cards (near-black fill, hairline border, rounded
+corners, accent chips) with the demo GIFs placed up front in the README. GitHub shows
+SVGs as images, so only system fonts render, motion is CSS inside the file, and
+photographs are embedded as data URIs (sources in assets/src/).
 
     python3 scripts/build.py      # writes assets/*.svg and dist/repos/<repo>/.github/*.svg
 Needs ffmpeg for resizing the embedded photographs.
 """
 
 import base64
+import itertools
 import subprocess
 import textwrap
 from datetime import date
@@ -22,20 +23,16 @@ OUT = ROOT / "assets"
 SRC = OUT / "src"
 REPO_OUT = ROOT / "dist" / "repos"
 
-THEMES = {
-    "light": {"paper": "#faf8f3", "ink": "#16181d", "dim": "#16181d99", "rule": "#16181d33", "accent": "#2547d0", "panel": "#f0ede5"},
-    "dark": {"paper": "#0d1117", "ink": "#ece8df", "dim": "#ece8df99", "rule": "#ece8df33", "accent": "#7c9bff", "panel": "#161b22"},
-}
-SERIF = "'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif"
+BG, BORDER, INK, DIM, ACCENT = "#0a0a0a", "#ffffff1a", "#ededed", "#a1a1a1", "#7c9bff"
+PANEL, GRID, GREEN, GRAY = "#111111", "#ffffff12", "#3ddc84", "#6b6b6b"
+SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif"
 MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace"
 
-NAME = "Ki-Pung (Kip) Park"
-SUBTITLE = "Fine-tuning, evaluating, and running language models locally."
-ABSTRACT = [
-    "CS student (ML & AI, ’27) at California Baptist University. I build",
-    "source-verified fine-tuning pipelines, run controlled LLM experiments,",
-    "and ship local-first AI tools that people actually use.",
-]
+NAME = "Kip Park"
+FULL_NAME = "Ki-Pung Park"
+TAGLINE = "I fine-tune, evaluate and run language models locally."
+ABOUT = ("CS (ML & AI, ’27) at California Baptist University. I build fine-tuning pipelines, "
+         "run LLM experiments and ship local-first AI tools.")
 TODAY = date.today()
 # The hero shows the first event that has not happened yet; past ones drop off on the
 # monthly rebuild (.github/workflows/rebuild.yml). Add new ones here.
@@ -49,16 +46,17 @@ FACTS = [
     ("Next", upcoming[0]) if upcoming else ("Focus", "LLM fine-tuning & evaluation"),
 ]
 
-# Large figure cards, in reading order. image = file in assets/src, or "draw:<name>".
-FIGURES = [
-    {"slug": "kanto", "title": "Living Kanto", "meta": "Simulation · local LLMs", "image": "kanto.jpg",
+# Large project cards. image = file in assets/src, or "draw:<name>". readme False keeps
+# the project for its repo banner only (Living Kanto is shown by its GIF instead).
+FEATURED = [
+    {"slug": "kanto", "title": "Living Kanto", "meta": "Simulation · local LLMs", "image": "kanto.jpg", "readme": False,
      "desc": "A persistent world where 100 residents, each run by a local language model, travel, work, talk and pursue their own ambitions.",
      "tags": "local LLMs · agents · persistent world state", "href": "https://github.com/kipung/living-kanto"},
-    {"slug": "finetune", "title": "Domain Fine-Tuning Pipeline", "meta": "CAIMLL · lab backbone", "image": "finetune.jpg",
+    {"slug": "finetune", "title": "Domain Fine-Tuning Pipeline", "meta": "CAIMLL · lab backbone", "image": "draw:pipeline",
      "desc": "Reference documents become source-verified training data, checked for evidence coverage, answer quality and reproducibility.",
      "tags": "QLoRA · Unsloth · vLLM · GGUF · evaluation"},
     {"slug": "subliminal", "title": "Subliminal Learning in LLMs", "meta": "Study lead · under review", "image": "subliminal-teacher.jpg", "fit": "meet",
-     "desc": "Can a hidden love of owls pass from teacher to student through number sequences? The teacher picked owls 53% of the time; students barely moved.",
+     "desc": "Can a hidden love of owls pass from teacher to student through number sequences? The teacher picked owls 53% of the time; a clean negative result: students barely moved.",
      "tags": "Llama 3.2 3B · LoRA · system prompts", "href": "https://github.com/kipung/WeHateOwls"},
     {"slug": "geoai", "title": "GeoAI: Overdose Risk Mapping", "meta": "AMCIS 2025 · coauthor", "image": "geoai.jpg",
      "desc": "A deep model predicts areas of suspected drug-overdose risk from geolocated posts; Kepler.gl maps turn its output into regional insight.",
@@ -66,7 +64,7 @@ FIGURES = [
 ]
 
 # Smaller cards, two per row. The first four show; the rest sit behind "More projects".
-MINIS = [
+PROJECTS = [
     {"slug": "degree", "title": "AI Degree Planning Companion", "meta": "Student Success", "image": "degree.jpg", "fit": "meet",
      "desc": "An agent that plans courses over a Neo4j prerequisite graph, on local models, streamed to a React chat UI.",
      "tags": "LangChain · Neo4j · FastAPI · Ollama · React", "href": "https://github.com/kipung/degree_planning_guide"},
@@ -94,7 +92,8 @@ MINIS = [
      "desc": "Study groups, real-time messaging, file sharing and a group calendar for students.",
      "href": "https://github.com/kipung/campusmate"},
     {"slug": "hackathon", "title": "FunctionGemma Hackathon", "meta": "3rd place · online", "image": "hackathon.jpg", "align": "xMidYMin",
-     "desc": "3rd place in the online division of the Cactus × Google DeepMind FunctionGemma Hackathon."},
+     "desc": "3rd place in the online division of the Cactus × Google DeepMind FunctionGemma Hackathon.",
+     "href": "https://github.com/kipung/functiongemma-hackathon"},
 ]
 
 PLATES = [
@@ -127,19 +126,21 @@ TIMELINE = [
 MILESTONES = [
     ((2024, 11), "ICPC"), ((2025, 8), "AMCIS"), ((2026, 1), "KSEA"), ((2026, 2), "Hackathon"), ((2026, 11), "SCCUR"),
 ]
+LANE_COLOR = {"research": ACCENT, "work": INK, "lead": GRAY}
+LANE_NAME = {"research": "Research", "work": "Work", "lead": "Leadership & teaching"}
 
-# Banners for the featured repos: written to dist/repos/<repo>/.github/banner-{light,dark}.svg
+# Banners for the featured repos: written to dist/repos/<repo>/.github/banner{,-m}.svg
 REPOS = [
-    {"repo": "living-kanto", "fig": "kanto"},
-    {"repo": "CSC422_Subliminal_Learning", "fig": "subliminal"},
-    {"repo": "WeHateOwls", "fig": "subliminal"},
-    {"repo": "BAY-min_personal_tutor", "mini": "baymin", "tags": "Reachy Mini · Gemini Live · OpenCV · Firestore · BLE"},
-    {"repo": "degree_planning_guide", "fig": "degree"},
-    {"repo": "terminal-browser", "fig": "browser"},
-    {"repo": "SET_PROJECT_3", "fig": "acm"},
-    {"repo": "tracr_to_transformer_lens_generalize", "mini": "tracr", "tags": "Tracr · JAX · TransformerLens · RASP"},
-    {"repo": "ffn_relu_vs_geglu_mnist", "mini": "geglu", "tags": "PyTorch Lightning · MNIST · bootstrap CIs"},
-    {"repo": "campusmate", "mini": "campusmate", "tags": "Flutter · Firebase · Dart"},
+    {"repo": "living-kanto", "slug": "kanto"},
+    {"repo": "CSC422_Subliminal_Learning", "slug": "subliminal"},
+    {"repo": "WeHateOwls", "slug": "subliminal"},
+    {"repo": "BAY-min_personal_tutor", "slug": "baymin", "tags": "Reachy Mini · Gemini Live · OpenCV · Firestore · BLE"},
+    {"repo": "degree_planning_guide", "slug": "degree"},
+    {"repo": "terminal-browser", "slug": "browser"},
+    {"repo": "SET_PROJECT_3", "slug": "acm"},
+    {"repo": "tracr_to_transformer_lens_generalize", "slug": "tracr", "tags": "Tracr · JAX · TransformerLens · RASP"},
+    {"repo": "ffn_relu_vs_geglu_mnist", "slug": "geglu", "tags": "PyTorch Lightning · MNIST · bootstrap CIs"},
+    {"repo": "campusmate", "slug": "campusmate", "tags": "Flutter · Firebase · Dart"},
 ]
 
 
@@ -154,91 +155,74 @@ def embed(name, width):
     return "data:image/jpeg;base64," + base64.b64encode(jpg).decode()
 
 
-def style(t):
-    return f"""<style>
-  .s {{ font-family: {SERIF}; }}
+# ---- text and layout helpers -------------------------------------------------------
+
+CSS = f"""<style>
+  .s {{ font-family: {SANS}; }}
   .m {{ font-family: {MONO}; }}
-  .ink {{ fill: {t['ink']}; }}
-  .dim {{ fill: {t['dim']}; }}
-  .acc {{ fill: {t['accent']}; }}
-  .cap {{ font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }}
+  .ink {{ fill: {INK}; }}
+  .dim {{ fill: {DIM}; }}
+  .acc {{ fill: {ACCENT}; }}
+  @keyframes pulse {{ 0%, 100% {{ opacity: 1 }} 50% {{ opacity: .3 }} }}
+  @keyframes ping {{ 0% {{ transform: scale(1); opacity: .6 }} 100% {{ transform: scale(3); opacity: 0 }} }}
+  @keyframes flow {{ to {{ stroke-dashoffset: -16 }} }}
+  .ping {{ transform-box: fill-box; transform-origin: center; animation: ping 2.4s ease-out infinite; }}
+  .flow {{ stroke-dasharray: 4 4; animation: flow 1s linear infinite; }}
 </style>"""
 
 
-def svg(w, h, label, t, body):
+def svg(w, h, label, body, css=""):
+    """A self-contained card: the whole canvas is the card, so nothing can touch its edge."""
     return (f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{w}" height="{h}" '
-            f'viewBox="0 0 {w} {h}" role="img" aria-label="{escape(label)}">\n{style(t)}\n'
-            f'<rect width="{w}" height="{h}" fill="{t["paper"]}"/>\n{body}\n</svg>\n')
+            f'viewBox="0 0 {w} {h}" role="img" aria-label="{escape(label, {chr(34): "&quot;"})}">\n{CSS}{css}\n'
+            f'<rect x=".5" y=".5" width="{w - 1}" height="{h - 1}" rx="14" fill="{BG}" stroke="{BORDER}"/>\n{body}\n</svg>\n')
 
 
-def lines(x, y, text, width_chars, size, cls, gap, italic=False):
-    it = ' font-style="italic"' if italic else ""
-    return "".join(
-        f'<text x="{x}" y="{y + i * gap}" class="{cls}" font-size="{size}"{it}>{escape(l)}</text>'
-        for i, l in enumerate(textwrap.wrap(text, width_chars))
-    )
+def char_w(size, kind):
+    """Average glyph width in px, rounded up so wrapped lines stay inside their column."""
+    return size * {"s": 0.52, "b": 0.57, "m": 0.62}[kind]
 
 
-def draw_terminal(x, y, w, h, t):
-    """A terminal split: an agent on the left, the live page it is showing on the right."""
-    half = w * 0.46
-    term = [("$ preview start", "#ece8df"), ("twin started · preview open", "#ece8df99"),
-            ("› agent: spacing fixed", "#ece8dfcc"), ("› reload · 0 errors", "#ece8dfcc"), ("✓ looks right", t["accent"])]
-    tl = "".join(f'<text x="{x + 14}" y="{y + 48 + i * 22}" class="m" font-size="11.5" fill="{c}">{escape(s)}</text>' for i, (s, c) in enumerate(term))
-    bx = x + half + 1
-    bw = w - half - 1
-    page = (f'<rect x="{bx}" y="{y + 26}" width="{bw}" height="{h - 26}" fill="#faf8f3"/>'
-            f'<rect x="{bx + 10}" y="{y + 34}" width="{bw - 20}" height="16" rx="8" fill="#e6e2d8"/>'
-            f'<text x="{bx + 20}" y="{y + 46}" class="m" font-size="9" fill="#16181d99">localhost:4321</text>'
-            f'<rect x="{bx + 16}" y="{y + 66}" width="{bw * .55:.0f}" height="12" fill="#16181d"/>'
-            f'<rect x="{bx + 16}" y="{y + 86}" width="{bw * .75:.0f}" height="6" fill="#16181d55"/>'
-            f'<rect x="{bx + 16}" y="{y + 98}" width="{bw * .68:.0f}" height="6" fill="#16181d55"/>'
-            f'<rect x="{bx + 16}" y="{y + 118}" width="{(bw - 44) / 2:.0f}" height="{h - 140}" fill="{THEMES["light"]["accent"]}"/>'
-            f'<rect x="{bx + 28 + (bw - 44) / 2:.0f}" y="{y + 118}" width="{(bw - 44) / 2:.0f}" height="{h - 140}" fill="#16181d22"/>')
-    return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#0b0d12"/>'
-            f'<rect x="{x}" y="{y}" width="{w}" height="26" fill="#1a1d24"/>'
-            + "".join(f'<circle cx="{x + 14 + i * 14}" cy="{y + 13}" r="4" fill="{c}"/>' for i, c in enumerate(["#ff5f57", "#febc2e", "#28c840"]))
-            + f'<text x="{x + w / 2}" y="{y + 17}" class="m" font-size="10" fill="#ece8df88" text-anchor="middle">ghostty · agent │ preview</text>'
-            + tl + page
-            + f'<rect x="{x + half}" y="{y + 26}" width="1" height="{h - 26}" fill="#ece8df33"/>')
+def text(x, y, s, size, cls="s ink", weight=None, extra=""):
+    wt = f' font-weight="{weight}"' if weight else ""
+    return f'<text x="{x}" y="{y:.1f}" class="{cls}" font-size="{size}"{wt}{extra}>{escape(s)}</text>'
 
 
-def picture(p, x, y, w, h, t, align="xMidYMid"):
-    if p["image"].startswith("draw:"):
-        return draw_terminal(x, y, w, h, t)
-    fit = p.get("fit", "slice")
-    back = f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#ffffff"/>' if fit == "meet" else ""
-    return (f'{back}<image x="{x}" y="{y}" width="{w}" height="{h}" preserveAspectRatio="{align} {fit}" '
-            f'href="{embed(p["image"], int(w * 1.6))}" xlink:href="{embed(p["image"], int(w * 1.6))}"/>'
-            f'<rect x="{x + .5}" y="{y + .5}" width="{w - 1}" height="{h - 1}" fill="none" stroke="{t["rule"]}"/>')
+def para(x, y, s, size, maxw, lh, cls="s ink", weight=None):
+    """Wrapped text. Returns (svg, y below the last line)."""
+    kind = "b" if weight else ("m" if "m" in cls.split() else "s")
+    rows = textwrap.wrap(s, max(1, int(maxw / char_w(size, kind))))
+    out = "".join(text(x, y + size * 0.95 + i * lh, row, size, cls, weight) for i, row in enumerate(rows))
+    return out, y + len(rows) * lh
 
 
-def card(p, num, flip, t, header=None):
-    """A large figure: picture on one side, numbered caption on the other."""
-    W, top = 1000, (64 if header else 0)
-    H = top + 300
-    iw, ih = 452, 282
-    ix = W - iw if flip else 0
-    tx = 0 if flip else iw + 40
-    tw_chars = 50
-    head = ""
-    if header:
-        head = (f'<text x="0" y="22" class="m cap ink">{escape(header[0])}</text>'
-                f'<text x="{W - 6}" y="22" class="m cap dim" text-anchor="end">{escape(header[1])}</text>'
-                f'<rect x="0" y="34" width="{W}" height="1" fill="{t["ink"]}"/><rect x="0" y="38" width="{W}" height="1" fill="{t["ink"]}"/>')
-    else:
-        head = f'<rect x="0" y="0" width="{W}" height="1" fill="{t["rule"]}"/>'
-    y0 = top + 9
-    label = f"Fig. {num}" if num else "Repository"
-    body = (head + picture(p, ix, y0, iw, ih, t)
-            + f'<text x="{tx}" y="{y0 + 22}" class="m acc" font-size="12.5" font-weight="700">{label}</text>'
-            + ("" if header else f'<text x="{(ix - 40) if flip else W - 6}" y="{y0 + 22}" class="m cap dim" text-anchor="end">{escape(p["meta"])}</text>')
-            + f'<text x="{tx}" y="{y0 + 70}" class="s ink" font-size="{min(40 if header else 33, int(1000 / len(p["title"])))}">{escape(p["title"])}</text>'
-            + lines(tx, y0 + 112, p["desc"], tw_chars, 18, "s ink", 27, italic=True)
-            + f'<rect x="{tx}" y="{y0 + 222}" width="40" height="1" fill="{t["accent"]}"/>'
-            + f'<text x="{tx}" y="{y0 + 248}" class="m dim" font-size="12.5" letter-spacing=".03em">{escape(p["tags"])}</text>'
-            + (f'<text x="{tx}" y="{y0 + 272}" class="m acc" font-size="12.5">{escape(link_label(p))} →</text>' if p.get("href") and not header else ""))
-    return svg(W, H, f'{label}. {p["title"]}: {p["desc"]}', t, body)
+def chips(x, y, items, maxw, size):
+    """Pill chips flowed left to right. items: lists of (text, class) segments, or a
+    (segments, dot) pair. Returns (svg, height)."""
+    h, pad, gap = round(size * 2.3), round(size * 0.9), round(size * 0.6)
+    out, cx, cy = [], 0, 0
+    for item in items:
+        segs, dot = item if isinstance(item, tuple) else (item, False)
+        wid = 2 * pad + (size + 2 if dot else 0) + sum(len(t) * char_w(size, "m" if "m" in c.split() else "s") for t, c in segs) \
+            + gap * (len(segs) - 1)
+        if cx and cx + wid > maxw:
+            cx, cy = 0, cy + h + gap
+        px, tx = x + cx, x + cx + pad
+        out.append(f'<rect x="{px}" y="{y + cy}" width="{wid:.0f}" height="{h}" rx="{h / 2:.0f}" fill="#ffffff0a" stroke="{BORDER}"/>')
+        if dot:
+            out.append(f'<circle cx="{tx + 3}" cy="{y + cy + h / 2}" r="3" fill="{GREEN}"/>'
+                       f'<circle cx="{tx + 3}" cy="{y + cy + h / 2}" r="3" fill="{GREEN}" class="ping"/>')
+            tx += size + 2
+        for t, c in segs:
+            kind = "m" if "m" in c.split() else "s"
+            out.append(text(f"{tx:.0f}", y + cy + h / 2 + size * 0.36, t, size, c))
+            tx += len(t) * char_w(size, kind) + gap
+        cx += wid + gap
+    return "".join(out), cy + h
+
+
+def tag_chips(tags, x, y, maxw, size):
+    return chips(x, y, [[(t, "m dim")] for t in tags.split(" · ")], maxw, size)
 
 
 def link_label(p):
@@ -246,322 +230,405 @@ def link_label(p):
     return href.replace("https://github.com/", "github.com/") if "github.com" in href else "read the paper"
 
 
-def mini(p, t):
-    W, H = 490, 330
-    body = (f'<rect x="0" y="0" width="{W}" height="1" fill="{t["rule"]}"/>'
-            + picture(p, 0, 12, W, 190, t, p.get("align", "xMidYMid"))
-            + f'<text x="0" y="234" class="s ink" font-size="24">{escape(p["title"])}</text>'
-            + f'<text x="{W - 6}" y="232" class="m cap dim" text-anchor="end">{escape(p["meta"])}</text>'
-            + lines(0, 262, p["desc"], 56, 15, "s ink", 21, italic=True)
-            + (f'<text x="0" y="318" class="m acc" font-size="11.5">{escape(link_label(p))} →</text>' if p.get("href") else ""))
-    return svg(W, H, f'{p["title"]}: {p["desc"]}', t, body)
+# ---- pictures ----------------------------------------------------------------------
+
+_clip_ids = itertools.count()
 
 
-def plate(pl, t):
-    W, H = 1000, 540
-    cw, ch, gap = 320, 400, 20
-    cells = ""
+def draw_terminal(x, y, w, h):
+    """A terminal split: an agent on the left, the live page it is showing on the right."""
+    half = w * 0.46
+    term = [("$ preview", INK), ("› fixed spacing", "#edededcc"), ("› reload", "#edededcc"), ("› 0 errors", "#edededcc"), ("✓ looks right", ACCENT)]
+    fs = min(11.5, (half - 22) / 9.3)
+    tl = "".join(f'<text x="{x + 14}" y="{y + 50 + i * 22}" class="m" font-size="{fs:.1f}" fill="{c}">{escape(s)}</text>' for i, (s, c) in enumerate(term))
+    bx, bw = x + half + 1, w - half - 1
+    page = (f'<rect x="{bx + 10}" y="{y + 36}" width="{bw - 20}" height="16" rx="8" fill="#ffffff12"/>'
+            f'<text x="{bx + 20}" y="{y + 47.5}" class="m" font-size="9" fill="{DIM}">localhost:4321</text>'
+            f'<rect x="{bx + 16}" y="{y + 68}" width="{bw * .55:.0f}" height="12" rx="3" fill="{INK}"/>'
+            f'<rect x="{bx + 16}" y="{y + 88}" width="{bw * .75:.0f}" height="6" rx="3" fill="#ffffff40"/>'
+            f'<rect x="{bx + 16}" y="{y + 100}" width="{bw * .68:.0f}" height="6" rx="3" fill="#ffffff40"/>'
+            f'<rect x="{bx + 16}" y="{y + 120}" width="{(bw - 44) / 2:.0f}" height="{h - 142}" rx="6" fill="{ACCENT}"/>'
+            f'<rect x="{bx + 28 + (bw - 44) / 2:.0f}" y="{y + 120}" width="{(bw - 44) / 2:.0f}" height="{h - 142}" rx="6" fill="#ffffff1a"/>')
+    return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{PANEL}"/>'
+            f'<rect x="{x}" y="{y}" width="{w}" height="26" fill="#1c1c1c"/>'
+            + "".join(f'<circle cx="{x + 14 + i * 14}" cy="{y + 13}" r="4" fill="{c}"/>' for i, c in enumerate(["#ff5f57", "#febc2e", "#28c840"]))
+            + f'<text x="{x + w / 2}" y="{y + 17}" class="m" font-size="10" fill="{DIM}" text-anchor="middle">ghostty · agent │ preview</text>'
+            + tl + page + f'<rect x="{x + half}" y="{y + 26}" width="1" height="{h - 26}" fill="#ffffff26"/>')
+
+
+def draw_pipeline(x, y, w, h):
+    """The fine-tuning pipeline: four stages joined by arrows whose dashes flow."""
+    stages = [("docs", "PDFs, notes"), ("verified", "Q&A pairs"), ("QLoRA", "fine-tune"), ("evals", "coverage")]
+    pad, gap = 18, 30
+    nw = (w - 2 * pad - 3 * gap) / 4
+    nh, ny = 96, y + h / 2 - 28
+    out = [f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{PANEL}"/>']
+    for i, (a, b) in enumerate(stages):
+        nx = x + pad + i * (nw + gap)
+        last = i == len(stages) - 1
+        out.append(f'<text x="{nx + nw / 2:.1f}" y="{ny - 12}" class="m dim" font-size="11" text-anchor="middle">0{i + 1}</text>'
+                   f'<rect x="{nx:.1f}" y="{ny}" width="{nw:.1f}" height="{nh}" rx="10" fill="{"#7c9bff1f" if last else BG}" '
+                   f'stroke="{ACCENT if last else "#ffffff2e"}"/>'
+                   f'<text x="{nx + nw / 2:.1f}" y="{ny + 44}" class="s ink" font-size="14" font-weight="600" text-anchor="middle">{escape(a)}</text>'
+                   f'<text x="{nx + nw / 2:.1f}" y="{ny + 64}" class="m dim" font-size="10" text-anchor="middle">{escape(b)}</text>')
+        if not last:
+            ax0, ax1, ay = nx + nw + 4, nx + nw + gap - 5, ny + nh / 2
+            out.append(f'<line x1="{ax0:.1f}" y1="{ay}" x2="{ax1:.1f}" y2="{ay}" stroke="{ACCENT}" stroke-width="1.6" class="flow"/>'
+                       f'<path d="M{ax1 - 5:.1f},{ay - 4} L{ax1 + 1:.1f},{ay} L{ax1 - 5:.1f},{ay + 4}" fill="none" stroke="{ACCENT}" stroke-width="1.6"/>')
+    out.append(f'<text x="{x + w / 2:.0f}" y="{y + h - 22}" class="m dim" font-size="11" text-anchor="middle">every answer traced to its source</text>')
+    return "".join(out)
+
+
+def picture(p, x, y, w, h, align="xMidYMid", r=10):
+    """A project image with rounded corners and a hairline border."""
+    cid = f"c{next(_clip_ids)}"
+    clip = f'<clipPath id="{cid}"><rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{r}"/></clipPath>'
+    if p["image"] == "draw:terminal":
+        inner = draw_terminal(x, y, w, h)
+    elif p["image"] == "draw:pipeline":
+        inner = draw_pipeline(x, y, w, h)
+    else:
+        fit = p.get("fit", "slice")
+        back = f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#ffffff"/>' if fit == "meet" else ""
+        uri = embed(p["image"], int(w * 1.6))
+        inner = f'{back}<image x="{x}" y="{y}" width="{w}" height="{h}" preserveAspectRatio="{align} {fit}" href="{uri}" xlink:href="{uri}"/>'
+    return (f'{clip}<g clip-path="url(#{cid})">{inner}</g>'
+            f'<rect x="{x + .5}" y="{y + .5}" width="{w - 1}" height="{h - 1}" rx="{r}" fill="none" stroke="{BORDER}"/>')
+
+
+# ---- project cards -----------------------------------------------------------------
+
+def info(p, w, k, banner=False, link=None, tags=True):
+    """The text block of a project card at width w. k holds the type sizes. Returns (svg, height)."""
+    out, y = [], 0
+    if not banner:
+        out.append(text(0, y + k["meta"] * 0.95, p["meta"], k["meta"], "m dim"))
+        y += k["meta"] + 12
+    s, y = para(0, y, p["title"], k["title"], w, round(k["title"] * 1.22), "s ink", 600)
+    y += 10
+    s2, y = para(0, y, p["desc"], k["desc"], w, round(k["desc"] * 1.55), "s dim")
+    out += [s, s2]
+    if tags and p.get("tags"):
+        c, ch = tag_chips(p["tags"], 0, y + 14, w, k["chip"])
+        out.append(c)
+        y += 14 + ch
+    if p.get("href") and not banner:
+        out.append(text(0, y + 20 + k["link"] * 0.95, f"{link or link_label(p)} →", k["link"], "m acc"))
+        y += 20 + k["link"] + 4
+    return "".join(out), y
+
+
+def banner_head(w, repo, meta, size):
+    """Repo name on the left, meta on the right (phones put meta in the text block instead)."""
+    pad = 28 if w > 600 else 24
+    return (text(pad, 34, f"kipung / {repo}", size, "m ink", 600)
+            + (text(w - pad, 34, meta, size, "m dim", extra=' text-anchor="end"') if meta else "")
+            + f'<rect x="0" y="52" width="{w}" height="1" fill="{BORDER}"/>')
+
+
+FEATURE_K = {"meta": 12, "title": 28, "desc": 16, "chip": 12, "link": 13}
+FEATURE_K_M = {"meta": 14, "title": 28, "desc": 18, "chip": 14, "link": 15}
+
+
+def feature(p, flip=False, header=None):
+    """Large card: image on one side, text on the other. header = (repo, meta) makes a repo banner."""
+    W, pad, iw, gap = 1000, 28, 440, 36
+    top = 52 if header else 0
+    tw = W - 2 * pad - iw - gap
+    block, bh = info(p, tw, FEATURE_K, banner=bool(header))
+    ih = max(250, round(bh))
+    H = top + 2 * pad + ih
+    ix, tx = (W - pad - iw, pad) if flip else (pad, pad + iw + gap)
+    body = ((banner_head(W, *header, 14) if header else "") + picture(p, ix, top + pad, iw, ih, p.get("align", "xMidYMid"))
+            + f'<g transform="translate({tx} {top + pad + (ih - bh) / 2:.1f})">{block}</g>')
+    return svg(W, H, f'{p["title"]}: {p["desc"]}', body)
+
+
+MW = 480  # phone width; GitHub shows these at roughly 0.8x on a phone
+
+
+def feature_m(p, header=None):
+    """Phone version of feature(): image on top, text below."""
+    W, pad = MW, 24
+    top = 52 if header else 0
+    iw, ih = W - 2 * pad, 250
+    block, bh = info(dict(p, href=None) if header else p, iw, FEATURE_K_M)
+    H = top + pad + ih + 24 + bh + pad
+    body = ((banner_head(W, header[0], None, 15) if header else "") + picture(p, pad, top + pad, iw, ih, p.get("align", "xMidYMid"))
+            + f'<g transform="translate({pad} {top + pad + ih + 24})">{block}</g>')
+    return svg(W, H, f'{p["title"]}: {p["desc"]}', body)
+
+
+MINI_K = {"meta": 11.5, "title": 20, "desc": 14.5, "chip": 11, "link": 12}
+MINI_K_M = {"meta": 13, "title": 22, "desc": 17, "chip": 12, "link": 15}
+
+
+def mini_height(p, phone):
+    if phone:
+        return 24 + 150 + 20 + info(p, 252, MINI_K_M, tags=False, link="on GitHub")[1] + 24
+    return 28 + 170 + 22 + info(p, 434, MINI_K)[1] + 28
+
+
+def row_height(p, phone):
+    """Cards share a row two at a time, so each takes the height of the taller one in its row."""
+    i = PROJECTS.index(p) // 2 * 2
+    return max(mini_height(q, phone) for q in PROJECTS[i:i + 2])
+
+
+def mini(p):
+    W, pad = 490, 28
+    block, _ = info(p, W - 2 * pad, MINI_K)
+    body = (picture(p, pad, pad, W - 2 * pad, 170, p.get("align", "xMidYMid"))
+            + f'<g transform="translate({pad} {pad + 170 + 22})">{block}</g>')
+    return svg(W, row_height(p, False), f'{p["title"]}: {p["desc"]}', body)
+
+
+def mini_m(p):
+    """Phone version of mini(): shown at half the screen width, so the type is large."""
+    W, pad = 300, 24
+    block, _ = info(p, W - 2 * pad, MINI_K_M, tags=False, link="on GitHub")
+    body = (picture(p, pad, pad, W - 2 * pad, 150, p.get("align", "xMidYMid"))
+            + f'<g transform="translate({pad} {pad + 150 + 20})">{block}</g>')
+    return svg(W, row_height(p, True), f'{p["title"]}: {p["desc"]}', body)
+
+
+# ---- photos ------------------------------------------------------------------------
+
+def caption(x, y, title, note, w, ts, ns):
+    a, y1 = para(x, y, title, ts, w, round(ts * 1.4), "s ink", 600)
+    b, y2 = para(x, y1 + 2, note, ns, w, round(ns * 1.5), "s dim")
+    return a + b, y2
+
+
+def plate(pl):
+    W, pad, gap, ph = 1000, 28, 16, 380
+    cw = (W - 2 * pad - 2 * gap) // 3
+    cells, bottom = "", 0
     for i, (img, title, note, align) in enumerate(pl["photos"]):
-        x = i * (cw + gap)
-        cells += (picture({"image": img}, x, 52, cw, ch, t, align)
-                  + f'<text x="{x}" y="{52 + ch + 28}" class="s ink" font-size="17" font-weight="700">{escape(title)}</text>'
-                  + f'<text x="{x}" y="{52 + ch + 50}" class="s dim" font-size="15" font-style="italic">{escape(note)}</text>')
-    body = (f'<text x="0" y="24" class="s ink" font-size="20"><tspan font-weight="700">{escape(pl["title"])}</tspan></text>'
-            f'<rect x="0" y="36" width="{W}" height="1" fill="{t["rule"]}"/>' + cells)
-    return svg(W, H, f'{pl["title"]}: ' + "; ".join(f"{a}, {b}" for _, a, b, _ in pl["photos"]), t, body)
+        x = pad + i * (cw + gap)
+        cap, end = caption(x, pad + 40 + ph + 16, title, note, cw, 15, 13)
+        cells += picture({"image": img}, x, pad + 40, cw, ph, align) + cap
+        bottom = max(bottom, end)
+    body = text(pad, pad + 16, pl["title"], 18, "s ink", 600) + cells
+    return svg(W, round(bottom + pad), _plate_label(pl), body)
 
 
-def timeline(t):
-    W = 1000
-    lx, rx = 300, W - 10
+def plate_m(pl):
+    """Phone version of plate(): one wide photo, then two side by side."""
+    W, pad = MW, 24
+    iw = W - 2 * pad
+    (a, *rest) = pl["photos"]
+    out = [text(pad, pad + 18, pl["title"], 22, "s ink", 600)]
+    y = pad + 40
+    out.append(picture({"image": a[0]}, pad, y, iw, 300, a[3]))
+    cap, y = caption(pad, y + 316, a[1], a[2], iw, 19, 17)
+    out.append(cap)
+    y += 22
+    cw, deepest = (iw - 16) // 2, 0
+    for i, (img, title, note, align) in enumerate(rest):
+        x = pad + i * (cw + 16)
+        out.append(picture({"image": img}, x, y, cw, 260, align))
+        cap, end = caption(x, y + 276, title, note, cw, 17, 15)
+        out.append(cap)
+        deepest = max(deepest, end)
+    return svg(W, round(deepest + pad), _plate_label(pl), "".join(out))
+
+
+def _plate_label(pl):
+    return f'{pl["title"]}: ' + "; ".join(f"{a}, {b}" for _, a, b, _ in pl["photos"])
+
+
+# ---- experience timeline -----------------------------------------------------------
+
+def _timeline_span():
     start = (2024, 1)
     end = max((2027, 6), (NOW[0] + (NOW[1] + 6 - 1) // 12, (NOW[1] + 6 - 1) % 12 + 1))
     mi = lambda ym: (ym[0] - start[0]) * 12 + ym[1] - 1
-    span = mi(end)
+    return end, mi, mi(end)
+
+
+def _timeline_label():
+    return "Experience: research, work and leadership from 2024 to now. " + "; ".join(l for _, l, _, _ in TIMELINE)
+
+
+def timeline():
+    W, pad = 1000, 28
+    lx, rx = 330, W - pad
+    end, mi, span = _timeline_span()
     X = lambda ym: lx + (rx - lx) * mi(ym) / span
-    row_h, top = 30, 70
-    H = top + len(TIMELINE) * row_h + 104
-    lane_color = {"research": t["accent"], "work": t["ink"], "lead": t["dim"]}
-    out = [f'<text x="0" y="24" class="s ink" font-size="20"><tspan class="acc" font-weight="700">Fig. 5.</tspan> <tspan font-style="italic">Research, work and leadership, 2024 to now.</tspan></text>',
-           f'<rect x="0" y="36" width="{W}" height="1" fill="{t["rule"]}"/>']
+    row_h, top = 30, 96
+    bottom = top + len(TIMELINE) * row_h
+    H = bottom + 120
+    out = [text(pad, pad + 16, "Experience", 18, "s ink", 600),
+           text(pad + 110, pad + 16, "research, work and leadership", 12, "m dim")]
     for yr in range(2024, end[0] + 1):
         x = X((yr, 1))
-        out.append(f'<rect x="{x:.1f}" y="{top - 14}" width="1" height="{len(TIMELINE) * row_h + 14}" fill="{t["rule"]}"/>'
+        out.append(f'<rect x="{x:.1f}" y="{top - 14}" width="1" height="{bottom - top + 14}" fill="{GRID}"/>'
                    f'<text x="{x + 5:.1f}" y="{top - 4}" class="m dim" font-size="11">{yr}</text>')
     nx = X(NOW)
-    out.append(f'<rect x="{nx:.1f}" y="{top - 14}" width="1.5" height="{len(TIMELINE) * row_h + 40}" fill="{t["accent"]}"/>'
+    out.append(f'<rect x="{nx:.1f}" y="{top - 14}" width="1.5" height="{bottom - top + 28}" fill="{ACCENT}"/>'
                f'<text x="{nx - 5:.1f}" y="{top - 4}" class="m acc" font-size="11" text-anchor="end">now</text>')
     gx = X((2027, 4))
-    out.append(f'<text x="{gx:.1f}" y="{top + len(TIMELINE) * row_h + 4}" class="m dim" font-size="10.5" text-anchor="middle">grad ’27</text>'
-               f'<circle cx="{gx:.1f}" cy="{top + len(TIMELINE) * row_h - 10}" r="3.5" fill="none" stroke="{t["ink"]}"/>')
+    out.append(f'<text x="{gx:.1f}" y="{bottom + 8}" class="m dim" font-size="10.5" text-anchor="middle">grad ’27</text>'
+               f'<circle cx="{gx:.1f}" cy="{bottom - 8}" r="3.5" fill="none" stroke="{INK}"/>')
     for i, (lane, label, a, b) in enumerate(TIMELINE):
         y = top + i * row_h
         x0, x1 = X(a), X(b or NOW)
-        c = lane_color[lane]
-        out.append(f'<text x="0" y="{y + 12}" class="s ink" font-size="14.5">{escape(label)}</text>'
-                   f'<rect x="{x0:.1f}" y="{y + 3}" width="{max(x1 - x0, 4):.1f}" height="11" fill="{c}"/>')
+        c = LANE_COLOR[lane]
+        out.append(text(pad, y + 13, label, 14, "s ink")
+                   + f'<rect x="{x0:.1f}" y="{y + 3}" width="{max(x1 - x0, 5):.1f}" height="10" rx="5" fill="{c}"/>')
         if b is None:
-            out.append(f'<path d="M{x1:.1f},{y + 3} l7,5.5 l-7,5.5 z" fill="{c}" style="animation: pulse 2.4s ease-in-out infinite"/>')
-    my = top + len(TIMELINE) * row_h + 46
-    out.append(f'<rect x="{lx}" y="{my - 8}" width="{rx - lx}" height="1" fill="{t["rule"]}"/>')
+            out.append(f'<circle cx="{x1:.1f}" cy="{y + 8}" r="4" fill="{c}" style="animation: pulse 2.4s ease-in-out infinite"/>')
+    my = bottom + 52
+    out.append(f'<rect x="{lx}" y="{my - 8}" width="{rx - lx}" height="1" fill="{BORDER}"/>')
     for j, (ym, label) in enumerate(MILESTONES):
         x = X(ym)
-        out.append(f'<circle cx="{x:.1f}" cy="{my - 8}" r="4" fill="{t["paper"]}" stroke="{t["accent"]}" stroke-width="1.6"/>'
+        out.append(f'<circle cx="{x:.1f}" cy="{my - 8}" r="4.5" fill="{BG}" stroke="{ACCENT}" stroke-width="1.6"/>'
                    f'<text x="{x:.1f}" y="{my + 12 + (j % 2) * 14}" class="m dim" font-size="10.5" text-anchor="middle">{escape(label)}</text>')
-    key = [("research", "Research"), ("work", "Work"), ("lead", "Leadership & teaching")]
-    for i, (lane, label) in enumerate(key):
-        out.append(f'<rect x="0" y="{my - 30 + i * 18}" width="10" height="10" fill="{lane_color[lane]}"/>'
-                   f'<text x="16" y="{my - 21 + i * 18}" class="m dim" font-size="11">{escape(label)}</text>')
+    for i, lane in enumerate(LANE_COLOR):
+        out.append(f'<rect x="{pad}" y="{my - 30 + i * 18}" width="10" height="10" rx="3" fill="{LANE_COLOR[lane]}"/>'
+                   f'<text x="{pad + 16}" y="{my - 21 + i * 18}" class="m dim" font-size="11">{escape(LANE_NAME[lane])}</text>')
     out.append(f'<text x="{lx - 12}" y="{my - 4}" class="m dim" font-size="10.5" text-anchor="end">talks, papers, awards</text>')
-    out.insert(0, "<style>@keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }</style>")
-    return svg(W, H, "Timeline of research, work and leadership from 2024 to now. " + "; ".join(l for _, l, _, _ in TIMELINE), t, "".join(out))
+    return svg(W, H, _timeline_label(), "".join(out))
 
 
-HERO_STYLE = """<style>
+def timeline_m():
+    """Phone version of timeline(): each label sits on its own line above its bar."""
+    W, pad = MW, 24
+    end, mi, span = _timeline_span()
+    X = lambda ym: pad + (W - 2 * pad) * mi(ym) / span
+    row_h, top = 50, 100
+    bottom = top + len(TIMELINE) * row_h
+    out = [text(pad, pad + 18, "Experience", 22, "s ink", 600),
+           text(pad, pad + 40, "research, work and leadership", 13, "m dim")]
+    for yr in range(2024, end[0] + 1):
+        x = X((yr, 1))
+        out.append(f'<rect x="{x:.1f}" y="{top - 12}" width="1" height="{bottom - top + 12}" fill="{GRID}"/>'
+                   f'<text x="{x + 5:.1f}" y="{top - 2}" class="m dim" font-size="14">{yr}</text>')
+    nx = X(NOW)
+    out.append(f'<rect x="{nx:.1f}" y="{top - 12}" width="2" height="{bottom - top + 20}" fill="{ACCENT}"/>'
+               f'<text x="{nx - 5:.1f}" y="{top - 2}" class="m acc" font-size="14" text-anchor="end">now</text>')
+    for i, (lane, label, a, b) in enumerate(TIMELINE):
+        y = top + 26 + i * row_h
+        x0, x1 = X(a), X(b or NOW)
+        c = LANE_COLOR[lane]
+        out.append(text(pad, y, label, 17, "s ink")
+                   + f'<rect x="{x0:.1f}" y="{y + 7}" width="{max(x1 - x0, 6):.1f}" height="10" rx="5" fill="{c}"/>')
+        if b is None:
+            out.append(f'<circle cx="{x1:.1f}" cy="{y + 12}" r="5" fill="{c}" style="animation: pulse 2.4s ease-in-out infinite"/>')
+    my = bottom + 30
+    out.append(f'<rect x="{pad}" y="{my}" width="{W - 2 * pad}" height="1" fill="{BORDER}"/>')
+    for j, (ym, label) in enumerate(MILESTONES):
+        x = X(ym)
+        anchor = "start" if x < pad + 24 else ("end" if x > W - pad - 40 else "middle")
+        out.append(f'<circle cx="{x:.1f}" cy="{my}" r="5" fill="{BG}" stroke="{ACCENT}" stroke-width="1.8"/>'
+                   f'<text x="{x:.1f}" y="{my + 26 + (j % 3) * 20}" class="m dim" font-size="14" text-anchor="{anchor}">{escape(label)}</text>')
+    ky = my + 26 + 3 * 20 + 18
+    kx = pad
+    for lane in LANE_COLOR:
+        out.append(f'<rect x="{kx}" y="{ky - 11}" width="12" height="12" rx="3" fill="{LANE_COLOR[lane]}"/>'
+                   f'<text x="{kx + 18}" y="{ky}" class="m dim" font-size="13">{escape(LANE_NAME[lane])}</text>')
+        kx += 18 + len(LANE_NAME[lane]) * 8.2 + 16
+    out.append(f'<text x="{pad}" y="{ky + 28}" class="m dim" font-size="13">○ talks, papers, awards</text>')
+    return svg(W, ky + 28 + pad, _timeline_label(), "".join(out))
+
+
+# ---- hero --------------------------------------------------------------------------
+
+HERO_CSS = """<style>
   @keyframes draw { 0% { stroke-dashoffset: 1 } 55%, 92% { stroke-dashoffset: 0; opacity: 1 } 100% { stroke-dashoffset: 0; opacity: 0 } }
   @keyframes pop { 0%, 1% { opacity: 0 } 2%, 92% { opacity: 1 } 100% { opacity: 0 } }
   @keyframes rise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
   .r1 { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }
   .r2 { animation: rise .8s .15s cubic-bezier(.2,.7,.2,1) both; }
   .ln { fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 9s .4s ease-out infinite; }
-</style>"""
+</style>
+<defs><filter id="glow" x="-10%" y="-20%" width="120%" height="140%"><feGaussianBlur stdDeviation="4"/></filter></defs>"""
 
 
-def loss_chart(fx, fy, fw, fh, t, k=1.0):
-    """Fig. 0: a schematic fine-tune settling. k scales the labels."""
-    def curve(pts):
-        return " ".join(f"{'M' if i == 0 else 'L'}{fx + px * fw:.1f},{fy + (1 - py) * fh:.1f}" for i, (px, py) in enumerate(pts))
-
+def loss_chart(px, py, pw, ph, k=1.0):
+    """A fine-tune settling, drawn in a panel. k scales the labels."""
+    fx, fy, fw, fh = px + 20 * k, py + 48 * k, pw - 40 * k, ph - 48 * k - 24 * k
+    curve = lambda pts: " ".join(f"{'M' if i == 0 else 'L'}{fx + a * fw:.1f},{fy + (1 - b) * fh:.1f}" for i, (a, b) in enumerate(pts))
     train = [(i / 24, 0.08 + 0.84 * (0.5 ** (i / 3.2)) + (0.03 if i % 3 == 1 else 0)) for i in range(25)]
     evals = [(i / 24, 0.2 + 0.72 * (0.5 ** (i / 3.6))) for i in range(0, 25, 3)]
-    ticks = "".join(f'<rect x="{fx + fw * i / 4:.1f}" y="{fy + fh}" width="1" height="5" fill="{t["rule"]}"/>' for i in range(5))
+    grid = "".join(f'<rect x="{fx}" y="{fy + fh * i / 4:.1f}" width="{fw}" height="1" fill="{GRID}"/>' for i in range(5))
     dots = "".join(
-        f'<circle cx="{fx + px * fw:.1f}" cy="{fy + (1 - py) * fh:.1f}" r="{3 * k:.1f}" fill="{t["paper"]}" stroke="{t["ink"]}" stroke-width="1.4" '
-        f'style="animation: pop 9s {0.8 + px * 4.2:.2f}s linear infinite both"/>' for px, py in evals)
-    return f"""<rect x="{fx}" y="{fy}" width="1" height="{fh}" fill="{t['rule']}"/><rect x="{fx}" y="{fy + fh}" width="{fw}" height="1" fill="{t['rule']}"/>
-{ticks}
-<path d="{curve(train)}" class="ln" pathLength="1" stroke="{t['accent']}" stroke-width="{2.2 * k:.1f}" stroke-linejoin="round"/>
+        f'<circle cx="{fx + a * fw:.1f}" cy="{fy + (1 - b) * fh:.1f}" r="{3 * k:.1f}" fill="{BG}" stroke="{INK}" stroke-width="1.4" '
+        f'style="animation: pop 9s {0.8 + a * 4.2:.2f}s linear infinite both"/>' for a, b in evals)
+    ly, fs = py + 26 * k, 11 * k
+    line = curve(train)
+    return f"""<rect x="{px}" y="{py}" width="{pw}" height="{ph}" rx="12" fill="{PANEL}" stroke="{BORDER}"/>
+{grid}
+<path d="{line}" class="ln" pathLength="1" stroke="{ACCENT}" stroke-width="{6 * k:.1f}" stroke-opacity=".55" filter="url(#glow)" stroke-linejoin="round"/>
+<path d="{line}" class="ln" pathLength="1" stroke="{ACCENT}" stroke-width="{2.2 * k:.1f}" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="{curve(evals)}" fill="none" stroke="{INK}" stroke-width="1" stroke-dasharray="3 4" opacity=".45"/>
 {dots}
-<path d="{curve(evals)}" fill="none" stroke="{t['ink']}" stroke-width="1" stroke-dasharray="3 4" opacity=".55"/>
-<text x="{fx + fw}" y="{fy + 6 * k:.0f}" class="m" font-size="{11 * k:.1f}" fill="{t['accent']}" text-anchor="end">— train loss</text>
-<text x="{fx + fw}" y="{fy + 22 * k:.0f}" class="m dim" font-size="{11 * k:.1f}" text-anchor="end">○ eval loss</text>
-<text x="{fx}" y="{fy + fh + 26 * k:.0f}" class="m dim" font-size="{11 * k:.1f}">steps →</text>
-<text x="{fx}" y="{fy + fh + 50 * k:.0f}" class="s ink" font-size="{14 * k:.1f}"><tspan font-weight="700">Fig. 0.</tspan> <tspan font-style="italic">A fine-tune settling (schematic).</tspan></text>"""
+<rect x="{px + 20 * k}" y="{ly - 4 * k:.1f}" width="{14 * k:.0f}" height="2.5" rx="1" fill="{ACCENT}"/>
+<text x="{px + 40 * k}" y="{ly}" class="m dim" font-size="{fs:.1f}">train loss</text>
+<circle cx="{px + 122 * k:.1f}" cy="{ly - 3 * k:.1f}" r="{3 * k:.1f}" fill="{BG}" stroke="{INK}" stroke-width="1.2"/>
+<text x="{px + 132 * k:.1f}" y="{ly}" class="m dim" font-size="{fs:.1f}">eval loss</text>
+<text x="{px + pw - 20 * k}" y="{ly}" class="m dim" font-size="{fs:.1f}" text-anchor="end">steps →</text>"""
 
 
-def hero(t):
-    W, H = 1000, 470
-    facts = "".join(
-        f'<text x="{48 + i * 318}" y="{H - 50}" class="m cap acc">{escape(k)}</text>'
-        f'<text x="{48 + i * 318}" y="{H - 26}" class="s ink" font-size="17">{escape(v)}</text>' for i, (k, v) in enumerate(FACTS))
-    abstract = "".join(f'<text x="48" y="{300 + i * 25}" class="s ink" font-size="17">{escape(l)}</text>' for i, l in enumerate(ABSTRACT))
-    body = f"""{HERO_STYLE}
-<text x="48" y="40" class="m cap ink">Park, K.-P. · California Baptist University</text>
-<text x="{W - 48}" y="40" class="m cap dim" text-anchor="end">Riverside, CA · {TODAY.year}</text>
-<rect x="48" y="54" width="{W - 96}" height="1" fill="{t['ink']}"/><rect x="48" y="58" width="{W - 96}" height="1" fill="{t['ink']}"/>
-<text x="46" y="158" class="s ink r1" font-size="64" letter-spacing="-1">{escape(NAME)}</text>
-<text x="48" y="204" class="s acc r2" font-size="22" font-style="italic">{escape(SUBTITLE)}</text>
-<text x="48" y="266" class="s ink" font-size="15" font-weight="700" letter-spacing=".04em">Abstract</text>
-{abstract}
-{loss_chart(640, 104, 312, 210, t)}
-<rect x="48" y="{H - 84}" width="{W - 96}" height="1" fill="{t['rule']}"/>
-{facts}"""
-    return svg(W, H, f"{NAME}. {SUBTITLE}", t, body)
+def fact_chips(x, y, maxw, size):
+    return chips(x, y, [([(k.upper(), "m acc"), (v, "s ink")], k == "Lab") for k, v in FACTS], maxw, size)
 
 
-# Phone versions: one column, about twice the type size. GitHub shows them when the
-# screen is 640px wide or less (see picture_md). W = 480 shows at roughly 0.75x on a phone.
-MW = 480
+def hero():
+    W, pad, lw = 1000, 40, 530
+    y = pad
+    sub = text(pad, y + 12, f"{FULL_NAME} · Riverside, CA", 13, "m dim")
+    name = text(pad - 2, y + 92, NAME, 68, "s ink r1", 700, ' letter-spacing="-2"')
+    tag, y1 = para(pad, y + 118, TAGLINE, 25, lw, 33, "s ink r2", 500)
+    about, y2 = para(pad, y1 + 14, ABOUT, 15.5, lw, 24, "s dim")
+    ph = 270
+    panel = loss_chart(W - pad - 340, pad, 340, ph)
+    cy = max(y2, pad + ph) + 30
+    c, ch = fact_chips(pad, cy, W - 2 * pad, 13)
+    return svg(W, round(cy + ch + pad), f"{NAME}. {TAGLINE}", sub + name + tag + about + panel + c, HERO_CSS)
 
 
-def hero_m(t):
-    W = MW
-    abstract = lines(0, 280, " ".join(ABSTRACT), 42, 19, "s ink", 28)
-    n_abs = len(textwrap.wrap(" ".join(ABSTRACT), 42))
-    fy = 280 + n_abs * 28 + 40
-    fh = 190
-    y = fy + fh + 100
-    facts = "".join(
-        f'<text x="0" y="{y + 34 + i * 64}" class="m acc" font-size="14" letter-spacing=".14em">{escape(k.upper())}</text>'
-        f'<text x="0" y="{y + 60 + i * 64}" class="s ink" font-size="21">{escape(v)}</text>' for i, (k, v) in enumerate(FACTS))
-    H = y + 34 + len(FACTS) * 64
-    body = f"""{HERO_STYLE}
-<text x="0" y="26" class="m ink" font-size="14" letter-spacing=".14em">PARK, K.-P. · CBU</text>
-<text x="{W - 2}" y="26" class="m dim" font-size="14" letter-spacing=".14em" text-anchor="end">RIVERSIDE · {TODAY.year}</text>
-<rect x="0" y="40" width="{W}" height="1" fill="{t['ink']}"/><rect x="0" y="44" width="{W}" height="1" fill="{t['ink']}"/>
-<text x="-2" y="118" class="s ink r1" font-size="47" letter-spacing="-1">{escape(NAME)}</text>
-{lines(0, 164, SUBTITLE, 36, 23, "s acc r2", 31, italic=True)}
-<text x="0" y="250" class="s ink" font-size="18" font-weight="700" letter-spacing=".04em">Abstract</text>
-{abstract}
-{loss_chart(6, fy, W - 10, fh, t, 1.35)}
-<rect x="0" y="{y}" width="{W}" height="1" fill="{t['rule']}"/>
-{facts}"""
-    return svg(W, H, f"{NAME}. {SUBTITLE}", t, body)
+def hero_m():
+    W, pad = MW, 24
+    iw = W - 2 * pad
+    sub = text(pad, pad + 12, f"{FULL_NAME} · Riverside, CA", 13, "m dim")
+    name = text(pad - 2, pad + 78, NAME, 56, "s ink r1", 700, ' letter-spacing="-1.5"')
+    tag, y1 = para(pad, pad + 104, TAGLINE, 23, iw, 31, "s ink r2", 500)
+    about, y2 = para(pad, y1 + 12, ABOUT, 17, iw, 26, "s dim")
+    ph = 240
+    panel = loss_chart(pad, y2 + 24, iw, ph, 1.2)
+    c, ch = fact_chips(pad, y2 + 24 + ph + 24, iw, 14)
+    return svg(W, round(y2 + 24 + ph + 24 + ch + pad), f"{NAME}. {TAGLINE}", sub + name + tag + about + panel + c, HERO_CSS)
 
 
-def card_m(p, num, t, header=None):
-    """Phone version of card(): picture on top, caption below."""
-    W = MW
-    out, y = [], 0
-    if header:
-        out.append(f'<text x="0" y="22" class="m ink" font-size="15" letter-spacing=".08em">{escape(header[0])}</text>'
-                   f'<text x="0" y="46" class="m dim" font-size="14" letter-spacing=".1em">{escape(header[1].upper())}</text>'
-                   f'<rect x="0" y="60" width="{W}" height="1" fill="{t["ink"]}"/><rect x="0" y="64" width="{W}" height="1" fill="{t["ink"]}"/>')
-        y = 78
-    else:
-        out.append(f'<rect x="0" y="0" width="{W}" height="1" fill="{t["rule"]}"/>')
-        y = 12
-    ih = 300
-    out.append(picture(p, 0, y, W, ih, t))
-    y += ih + 36
-    label = f"Fig. {num}" if num else "Repository"
-    if not header:
-        out.append(f'<text x="0" y="{y}" class="m acc" font-size="16" font-weight="700">{label}</text>'
-                   f'<text x="{W - 2}" y="{y}" class="m dim" font-size="13" letter-spacing=".1em" text-anchor="end">{escape(p["meta"].upper())}</text>')
-        y += 46
-    else:
-        y += 4
-    tl = textwrap.wrap(p["title"], 24)
-    out.append(lines(0, y, p["title"], 24, 34, "s ink", 40))
-    y += (len(tl) - 1) * 40 + 44
-    dl = textwrap.wrap(p["desc"], 43)
-    out.append(lines(0, y, p["desc"], 43, 21, "s ink", 30, italic=True))
-    y += (len(dl) - 1) * 30 + 34
-    out.append(f'<rect x="0" y="{y}" width="48" height="1.5" fill="{t["accent"]}"/>')
-    y += 30
-    gl = textwrap.wrap(p["tags"], 46)
-    out.append(lines(0, y, p["tags"], 46, 16, "m dim", 24))
-    y += (len(gl) - 1) * 24
-    if p.get("href") and not header:
-        y += 34
-        out.append(f'<text x="0" y="{y}" class="m acc" font-size="16">{escape(link_label(p))} →</text>')
-    return svg(W, y + 16, f'{label}. {p["title"]}: {p["desc"]}', t, "".join(out))
-
-
-def mini_m_height(p):
-    """Cards share a row two at a time, so each takes the height of the taller one in its row."""
-    i = MINIS.index(p) // 2 * 2
-    return max(mini_m_layout(q)[1] for q in MINIS[i:i + 2])
-
-
-def mini_m_layout(p):
-    tl, dl = textwrap.wrap(p["title"], 15), textwrap.wrap(p["desc"], 22)
-    y_title = 190 + 12 + 42
-    y_meta = y_title + (len(tl) - 1) * 34 + 32
-    y_desc = y_meta + 40
-    y_link = y_desc + (len(dl) - 1) * 30 + 44
-    return (y_title, y_meta, y_desc, y_link), y_link + 14
-
-
-def mini_m(p, t):
-    """Phone version of mini(): shown at half the screen width, so the type is large."""
-    W, H = 300, mini_m_height(p)
-    (y_title, y_meta, y_desc, y_link), _ = mini_m_layout(p)
-    body = (f'<rect x="0" y="0" width="{W}" height="1" fill="{t["rule"]}"/>'
-            + picture(p, 0, 12, W, 190, t, p.get("align", "xMidYMid"))
-            + lines(0, y_title, p["title"], 15, 30, "s ink", 34)
-            + f'<text x="0" y="{y_meta}" class="m dim" font-size="17" letter-spacing=".06em">{escape(p["meta"])}</text>'
-            + lines(0, y_desc, p["desc"], 22, 21, "s ink", 30, italic=True)
-            + (f'<text x="0" y="{y_link}" class="m acc" font-size="18">on GitHub →</text>' if p.get("href") else ""))
-    return svg(W, H, f'{p["title"]}: {p["desc"]}', t, body)
-
-
-def plate_m(pl, t):
-    """Phone version of plate(): one wide photo, then two side by side."""
-    W = MW
-    (a, *rest) = pl["photos"]
-    out = [f'<text x="0" y="28" class="s ink" font-size="25" font-weight="700">{escape(pl["title"])}</text>',
-           f'<rect x="0" y="42" width="{W}" height="1" fill="{t["rule"]}"/>']
-    out.append(picture({"image": a[0]}, 0, 56, W, 320, t, a[3])
-               + f'<text x="0" y="{56 + 320 + 32}" class="s ink" font-size="21" font-weight="700">{escape(a[1])}</text>'
-               + f'<text x="0" y="{56 + 320 + 60}" class="s dim" font-size="19" font-style="italic">{escape(a[2])}</text>')
-    y0, cw, ch = 56 + 320 + 92, (W - 20) // 2, 290
-    deepest = 0
-    for i, (img, title, note, align) in enumerate(rest):
-        x = i * (cw + 20)
-        tl, nl = textwrap.wrap(title, 19), textwrap.wrap(note, 22)
-        out.append(picture({"image": img}, x, y0, cw, ch, t, align)
-                   + lines(x, y0 + ch + 32, title, 19, 20, "s ink", 26).replace('class="s ink"', 'class="s ink" font-weight="700"')
-                   + lines(x, y0 + ch + 32 + len(tl) * 26 + 4, note, 22, 18, "s dim", 25, italic=True))
-        deepest = max(deepest, ch + 32 + len(tl) * 26 + 4 + (len(nl) - 1) * 25)
-    return svg(W, y0 + deepest + 16, f'{pl["title"]}: ' + "; ".join(f"{a}, {b}" for _, a, b, _ in pl["photos"]), t, "".join(out))
-
-
-def timeline_m(t):
-    """Phone version of timeline(): each label sits on its own line above its bar."""
-    W = MW
-    start = (2024, 1)
-    end = max((2027, 6), (NOW[0] + (NOW[1] + 6 - 1) // 12, (NOW[1] + 6 - 1) % 12 + 1))
-    mi = lambda ym: (ym[0] - start[0]) * 12 + ym[1] - 1
-    X = lambda ym: (W - 12) * mi(ym) / mi(end)
-    row_h, top = 50, 104
-    lane_color = {"research": t["accent"], "work": t["ink"], "lead": t["dim"]}
-    bottom = top + len(TIMELINE) * row_h
-    out = ["<style>@keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }</style>",
-           f'<text x="0" y="28" class="s ink" font-size="23"><tspan class="acc" font-weight="700">Fig. 5.</tspan> <tspan font-style="italic">Research, work and leadership,</tspan></text>',
-           f'<text x="0" y="56" class="s ink" font-size="23" font-style="italic">2024 to now.</text>',
-           f'<rect x="0" y="70" width="{W}" height="1" fill="{t["rule"]}"/>']
-    for yr in range(2024, end[0] + 1):
-        x = X((yr, 1))
-        out.append(f'<rect x="{x:.1f}" y="{top - 12}" width="1" height="{bottom - top + 12}" fill="{t["rule"]}"/>'
-                   f'<text x="{x + 5:.1f}" y="{top - 2}" class="m dim" font-size="14">{yr}</text>')
-    nx = X(NOW)
-    out.append(f'<rect x="{nx:.1f}" y="{top - 12}" width="2" height="{bottom - top + 20}" fill="{t["accent"]}"/>'
-               f'<text x="{nx - 5:.1f}" y="{top - 2}" class="m acc" font-size="14" text-anchor="end">now</text>')
-    for i, (lane, label, a, b) in enumerate(TIMELINE):
-        y = top + 26 + i * row_h
-        x0, x1 = X(a), X(b or NOW)
-        c = lane_color[lane]
-        out.append(f'<text x="0" y="{y}" class="s ink" font-size="18">{escape(label)}</text>'
-                   f'<rect x="{x0:.1f}" y="{y + 7}" width="{max(x1 - x0, 5):.1f}" height="11" fill="{c}"/>')
-        if b is None:
-            out.append(f'<path d="M{x1:.1f},{y + 7} l8,5.5 l-8,5.5 z" fill="{c}" style="animation: pulse 2.4s ease-in-out infinite"/>')
-    my = bottom + 30
-    out.append(f'<rect x="0" y="{my}" width="{W - 12}" height="1" fill="{t["rule"]}"/>')
-    for j, (ym, label) in enumerate(MILESTONES):
-        x = X(ym)
-        anchor = "start" if x < 40 else ("end" if x > W - 60 else "middle")
-        out.append(f'<circle cx="{x:.1f}" cy="{my}" r="5" fill="{t["paper"]}" stroke="{t["accent"]}" stroke-width="1.8"/>'
-                   f'<text x="{x:.1f}" y="{my + 26 + (j % 3) * 20}" class="m dim" font-size="14" text-anchor="{anchor}">{escape(label)}</text>')
-    ky = my + 26 + 3 * 20 + 18
-    key = [("research", "Research"), ("work", "Work"), ("lead", "Leadership & teaching")]
-    kx = 0
-    for lane, label in key:
-        out.append(f'<rect x="{kx}" y="{ky - 11}" width="12" height="12" fill="{lane_color[lane]}"/>'
-                   f'<text x="{kx + 18}" y="{ky}" class="m dim" font-size="14">{escape(label)}</text>')
-        kx += 18 + len(label) * 8.6 + 22
-    out.append(f'<text x="0" y="{ky + 28}" class="m dim" font-size="14">○ talks, papers, awards</text>')
-    return svg(W, ky + 40, "Timeline of research, work and leadership from 2024 to now. " + "; ".join(l for _, l, _, _ in TIMELINE), t, "".join(out))
-
+# ---- README ------------------------------------------------------------------------
 
 PHONE = "(max-width: 640px)"
 
 
 def picture_md(stem, alt, width="100%", base="assets/"):
-    """Light and dark artwork, plus a phone version for narrow screens.
+    """A dark card with its phone version for narrow screens.
 
-    GitHub rewrites any media query that mentions prefers-color-scheme so it matches the
-    viewer's GitHub theme, dropping the rest of the query. So the phone source must not
-    mention a color scheme: phones get the light phone version in either theme.
+    GitHub shows a phone only one variant of a themed <picture>, which is why the artwork
+    has a single dark theme: nothing can pick the wrong one.
     """
-    return (f'<picture><source media="{PHONE}" srcset="{base}{stem}-m-light.svg">'
-            f'<source media="(prefers-color-scheme: dark)" srcset="{base}{stem}-dark.svg">'
-            f'<img src="{base}{stem}-light.svg" width="{width}" alt="{escape(alt, {chr(34): "&quot;"})}"></picture>')
+    return (f'<picture><source media="{PHONE}" srcset="{base}{stem}-m.svg">'
+            f'<img src="{base}{stem}.svg" width="{width}" alt="{escape(alt, {chr(34): "&quot;"})}"></picture>')
 
 
 def readme():
     link = lambda href, inner: f'<a href="{href}">{inner}</a>' if href else inner
-    figs = "\n".join(link(p.get("href"), picture_md(f"fig-{p['slug']}", f"Fig. {i}. {p['title']}: {p['desc']}"))
-                     for i, p in enumerate(FIGURES, 1))
-    minis = [link(p.get("href"), picture_md(f"mini-{p['slug']}", f"{p['title']}: {p['desc']}", "49%")) for p in MINIS]
+    featured = "\n".join(link(p.get("href"), picture_md(f"feat-{p['slug']}", f"{p['title']}: {p['desc']}"))
+                         for p in FEATURED if p.get("readme", True))
+    minis = [link(p.get("href"), picture_md(f"proj-{p['slug']}", f"{p['title']}: {p['desc']}", "49%")) for p in PROJECTS]
     rows = lambda ms: "\n\n".join("<p>\n" + "\n".join(ms[i:i + 2]) + "\n</p>" for i in range(0, len(ms), 2))
-    mini_rows = (rows(minis[:4]) + f"\n\n<details>\n<summary><b>{len(minis) - 4} more projects</b></summary>\n\n"
-                 + rows(minis[4:]) + "\n\n</details>")
-    plates = "\n\n".join(picture_md(f"plate-{pl['slug']}", f"{pl['title']}: " + "; ".join(f"{a}, {c}" for _, a, c, _ in pl["photos"]))
-                          for pl in PLATES)
+    more = (rows(minis[:4]) + f"\n\n<details>\n<summary><b>{len(minis) - 4} more projects</b></summary>\n\n"
+            + rows(minis[4:]) + "\n\n</details>")
+    photos = "\n\n".join(picture_md(f"photos-{pl['slug']}", _plate_label(pl)) for pl in PLATES)
     return (ROOT / "scripts" / "README.template.md").read_text(encoding="utf-8").format(
-        hero=picture_md("hero", f"{NAME}. {SUBTITLE}"), figures=figs, minis=mini_rows, plates=plates,
-        timeline=picture_md("timeline", "Fig. 5. Timeline of research, work and leadership from 2024 to now."))
+        hero=picture_md("hero", f"{NAME}. {TAGLINE}"), featured=featured, projects=more, photos=photos,
+        timeline=picture_md("timeline", "Experience: research, work and leadership from 2024 to now."))
 
 
 def write(path, text):
@@ -570,32 +637,25 @@ def write(path, text):
 
 
 if __name__ == "__main__":
-    by_slug = {p["slug"]: p for p in FIGURES + MINIS}
-    for name, t in THEMES.items():
-        write(OUT / f"hero-{name}.svg", hero(t))
-        if name == "light":
-            write(OUT / f"hero-m-{name}.svg", hero_m(t))
-        write(OUT / f"timeline-{name}.svg", timeline(t))
-        if name == "light":
-            write(OUT / f"timeline-m-{name}.svg", timeline_m(t))
-        for i, p in enumerate(FIGURES, 1):
-            write(OUT / f"fig-{p['slug']}-{name}.svg", card(p, i, i % 2 == 0, t))
-            if name == "light":
-                write(OUT / f"fig-{p['slug']}-m-{name}.svg", card_m(p, i, t))
-        for p in MINIS:
-            write(OUT / f"mini-{p['slug']}-{name}.svg", mini(p, t))
-            if name == "light":
-                write(OUT / f"mini-{p['slug']}-m-{name}.svg", mini_m(p, t))
-        for pl in PLATES:
-            write(OUT / f"plate-{pl['slug']}-{name}.svg", plate(pl, t))
-            if name == "light":
-                write(OUT / f"plate-{pl['slug']}-m-{name}.svg", plate_m(pl, t))
-        for r in REPOS:
-            p = dict(by_slug[r.get("fig") or r["mini"]])
-            p["tags"] = r.get("tags") or p["tags"]
-            header = (f"kipung / {r['repo']}", p["meta"])
-            write(REPO_OUT / r["repo"] / ".github" / f"banner-{name}.svg", card(p, None, False, t, header=header))
-            if name == "light":
-                write(REPO_OUT / r["repo"] / ".github" / f"banner-m-{name}.svg", card_m(p, None, t, header=header))
+    by_slug = {p["slug"]: p for p in FEATURED + PROJECTS}
+    write(OUT / "hero.svg", hero())
+    write(OUT / "hero-m.svg", hero_m())
+    write(OUT / "timeline.svg", timeline())
+    write(OUT / "timeline-m.svg", timeline_m())
+    for i, p in enumerate(q for q in FEATURED if q.get("readme", True)):
+        write(OUT / f"feat-{p['slug']}.svg", feature(p, flip=i % 2 == 1))
+        write(OUT / f"feat-{p['slug']}-m.svg", feature_m(p))
+    for p in PROJECTS:
+        write(OUT / f"proj-{p['slug']}.svg", mini(p))
+        write(OUT / f"proj-{p['slug']}-m.svg", mini_m(p))
+    for pl in PLATES:
+        write(OUT / f"photos-{pl['slug']}.svg", plate(pl))
+        write(OUT / f"photos-{pl['slug']}-m.svg", plate_m(pl))
+    for r in REPOS:
+        p = dict(by_slug[r["slug"]])
+        p["tags"] = r.get("tags") or p["tags"]
+        header = (r["repo"], p["meta"])
+        write(REPO_OUT / r["repo"] / ".github" / "banner.svg", feature(p, header=header))
+        write(REPO_OUT / r["repo"] / ".github" / "banner-m.svg", feature_m(p, header=header))
     write(ROOT / "README.md", readme())
     print("wrote", len(list(OUT.glob("*.svg"))), "profile SVGs and", len(REPOS) * 2, "repo banners")
