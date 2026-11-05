@@ -24,8 +24,8 @@
     <td width="50%"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="Claude Code gets a plain-English request, edits the page, then reloads, fills in and clicks it in the terminal-browser split beside it"></a></td>
   </tr>
   <tr>
-    <td><b>Living Kanto</b><br>100 residents, each run by a local LLM, living in a persistent world.</td>
-    <td><b>Terminal Browser</b><br>Claude Code drives a live page in a split beside your terminal.</td>
+    <td valign="top"><b>Living Kanto</b><br>A persistent world where 100 residents, each run by a local language model, travel, work, talk and pursue their own ambitions.<br><sub>local LLMs · agents · persistent world state · <a href="https://github.com/kipung/living-kanto">github.com/kipung/living-kanto →</a></sub></td>
+    <td valign="top"><b>Terminal Browser</b><br>Claude Code drives a live page in a split beside your terminal.<br><sub>Ghostty · kitty · WezTerm · tmux · <a href="https://github.com/kipung/terminal-browser">github.com/kipung/terminal-browser →</a></sub></td>
   </tr>
 </table>
 

@@ -31,8 +31,8 @@ MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monosp
 NAME = "Kip Park"
 FULL_NAME = "Ki-Pung Park"
 TAGLINE = "AI researcher and engineer, focused on language models."
-ABOUT = ("CS (ML & AI, ’27) at California Baptist University. I build fine-tuning pipelines, "
-         "run LLM experiments and ship local-first AI tools.")
+ABOUT = ("CS (ML & AI, ’27) at California Baptist University. I build source-verified fine-tuning "
+         "pipelines, run controlled LLM experiments, and ship local-first AI tools that people actually use.")
 TODAY = date.today()
 # The hero shows the first event that has not happened yet; past ones drop off on the
 # monthly rebuild (.github/workflows/rebuild.yml). Add new ones here.
@@ -74,7 +74,7 @@ PROJECTS = [
     {"slug": "hydro", "title": "Rainfall Transfer Between Gauges", "meta": "SCCUR 2026", "image": "hydro.jpg", "fit": "meet",
      "desc": "Hourly rainfall from one gauge estimated from another across 28 years of records; held-out event hours reach R² = 0.58.",
      "tags": "Python · time series · lagged OLS"},
-    {"slug": "lensing", "title": "Gravitational Lensing", "meta": "Physics research", "image": "lensing.jpg",
+    {"slug": "lensing", "title": "Gravitational Lensing", "meta": "Physics research", "image": "lensing.gif",
      "desc": "A simulation of light rays bending as they pass rows of masses."},
     {"slug": "acm", "title": "CBU ACM Website", "meta": "Team project", "image": "acm.jpg",
      "desc": "Built by the Software Engineering Team I founded, with Brandon Magana and the SET crew, using Scrum and GitHub flow.",
@@ -148,7 +148,11 @@ REPOS = [
 
 @lru_cache(maxsize=None)
 def embed(name, width):
-    """A source photo resized to `width` px and returned as a JPEG data URI."""
+    """A source photo resized to `width` px and returned as a JPEG data URI.
+
+    GIFs come from assets/demos and are embedded untouched so they keep animating."""
+    if name.endswith(".gif"):
+        return "data:image/gif;base64," + base64.b64encode((OUT / "demos" / name).read_bytes()).decode()
     jpg = subprocess.run(
         ["ffmpeg", "-v", "error", "-i", str(SRC / name), "-vf", f"scale='min({width},iw)':-2",
          "-q:v", "6", "-f", "image2", "-c:v", "mjpeg", "pipe:1"],
