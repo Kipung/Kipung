@@ -19,12 +19,21 @@
 <picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/fig-finetune-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/fig-finetune-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/fig-finetune-dark.svg"><img src="assets/fig-finetune-light.svg" width="100%" alt="Fig. 2. Domain Fine-Tuning Pipeline: Reference documents become source-verified training data, checked for evidence coverage, answer quality and reproducibility."></picture>
 <a href="https://github.com/kipung/WeHateOwls"><picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/fig-subliminal-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/fig-subliminal-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/fig-subliminal-dark.svg"><img src="assets/fig-subliminal-light.svg" width="100%" alt="Fig. 3. Subliminal Learning in LLMs: Can a hidden love of owls pass from teacher to student through number sequences? The teacher picked owls 53% of the time; students barely moved."></picture></a>
 <a href="https://aisel.aisnet.org/amcis2025/intelfuture/intelfuture/27/"><picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/fig-geoai-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/fig-geoai-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/fig-geoai-dark.svg"><img src="assets/fig-geoai-light.svg" width="100%" alt="Fig. 4. GeoAI: Overdose Risk Mapping: A deep model predicts areas of suspected drug-overdose risk from geolocated posts; Kepler.gl maps turn its output into regional insight."></picture></a>
-<picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/fig-hydro-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/fig-hydro-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/fig-hydro-dark.svg"><img src="assets/fig-hydro-light.svg" width="100%" alt="Fig. 5. Rainfall Transfer Between Gauges: Hourly rainfall from one gauge estimated from another across 28 years of records; held-out event hours reach R² = 0.58."></picture>
-<a href="https://github.com/kipung/degree_planning_guide"><picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/fig-degree-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/fig-degree-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/fig-degree-dark.svg"><img src="assets/fig-degree-light.svg" width="100%" alt="Fig. 6. AI Degree Planning Companion: An agent that plans courses over a Neo4j prerequisite graph, on local models, streamed to a React chat UI."></picture></a>
-<a href="https://github.com/kipung/terminal-browser"><picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/fig-browser-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/fig-browser-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/fig-browser-dark.svg"><img src="assets/fig-browser-light.svg" width="100%" alt="Fig. 7. Terminal Browser Split: A live, clickable browser preview in a native terminal split, opened by you with a hotkey or by any coding agent with one command."></picture></a>
-<a href="https://github.com/kipung/SET_PROJECT_3"><picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/fig-acm-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/fig-acm-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/fig-acm-dark.svg"><img src="assets/fig-acm-light.svg" width="100%" alt="Fig. 8. CBU ACM Website: Built by the Software Engineering Team I founded, with Brandon Magana and the SET crew, using Scrum and GitHub flow."></picture></a>
 
-### More from the lab
+### More projects
+
+<p>
+<a href="https://github.com/kipung/degree_planning_guide"><picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/mini-degree-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/mini-degree-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/mini-degree-dark.svg"><img src="assets/mini-degree-light.svg" width="49%" alt="AI Degree Planning Companion: An agent that plans courses over a Neo4j prerequisite graph, on local models, streamed to a React chat UI."></picture></a>
+<a href="https://github.com/kipung/terminal-browser"><picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/mini-browser-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/mini-browser-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/mini-browser-dark.svg"><img src="assets/mini-browser-light.svg" width="49%" alt="Terminal Browser Split: A live, clickable browser preview in a native terminal split, opened by you with a hotkey or by any coding agent with one command."></picture></a>
+</p>
+
+<p>
+<picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/mini-hydro-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/mini-hydro-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/mini-hydro-dark.svg"><img src="assets/mini-hydro-light.svg" width="49%" alt="Rainfall Transfer Between Gauges: Hourly rainfall from one gauge estimated from another across 28 years of records; held-out event hours reach R² = 0.58."></picture>
+<a href="https://github.com/kipung/SET_PROJECT_3"><picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/mini-acm-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/mini-acm-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/mini-acm-dark.svg"><img src="assets/mini-acm-light.svg" width="49%" alt="CBU ACM Website: Built by the Software Engineering Team I founded, with Brandon Magana and the SET crew, using Scrum and GitHub flow."></picture></a>
+</p>
+
+<details>
+<summary><b>6 more projects</b></summary>
 
 <p>
 <a href="https://github.com/kipung/tracr_to_transformer_lens_generalize"><picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/mini-tracr-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/mini-tracr-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/mini-tracr-dark.svg"><img src="assets/mini-tracr-light.svg" width="49%" alt="Tracr → TransformerLens: Compile a RASP program with Tracr, convert it to TransformerLens, check both decode alike."></picture></a>
@@ -41,34 +50,37 @@
 <picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/mini-hackathon-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/mini-hackathon-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/mini-hackathon-dark.svg"><img src="assets/mini-hackathon-light.svg" width="49%" alt="FunctionGemma Hackathon: 3rd place in the online division of the Cactus × Google DeepMind FunctionGemma Hackathon."></picture>
 </p>
 
+</details>
+
 ## In motion
 
 <table>
   <tr>
-    <td width="50%"><a href="https://github.com/kipung/living-kanto"><img src="assets/demos/kanto.gif" width="100%" alt="Living Kanto replay: residents walk through town, each deciding where to go next"></a></td>
-    <td width="50%"><img src="assets/demos/lensing.gif" width="100%" alt="Gravitational lensing simulation: light rays bend as they reach rows of masses"></td>
+    <td width="33%"><a href="https://github.com/kipung/living-kanto"><img src="assets/demos/kanto.gif" width="100%" alt="Living Kanto replay: residents walk through town, each deciding where to go next"></a></td>
+    <td width="34%"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="terminal-browser: an agent in a Ghostty pane reads, restyles, fills in and clicks a page in the browser split beside it"></a></td>
+    <td width="33%"><img src="assets/demos/lensing.gif" width="100%" alt="Gravitational lensing simulation: light rays bend as they reach rows of masses"></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Living Kanto</b> · one decision at a time</sub></td>
-    <td align="center"><sub><b>Gravitational lensing</b> · computational physics research</sub></td>
-  </tr>
-  <tr>
-    <td colspan="2"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="terminal-browser: commands in the left pane drive a live browser split in Ghostty showing kipung.github.io"></a></td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center"><sub><b>Terminal Browser Split</b> · commands on the left drive a live browser on the right</sub></td>
+    <td align="center"><sub><b>Living Kanto</b> · 100 local-LLM residents</sub></td>
+    <td align="center"><sub><b>Terminal Browser</b> · an agent drives a live page</sub></td>
+    <td align="center"><sub><b>Gravitational lensing</b> · physics research</sub></td>
   </tr>
 </table>
 
 ## Photos
 
+<details>
+<summary><b>Conferences, competitions, robots and hardware</b></summary>
+
 <picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/plate-room-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/plate-room-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/plate-room-dark.svg"><img src="assets/plate-room-light.svg" width="100%" alt="Conferences &amp; competitions: AMCIS 2025, Montréal, Presenting our GeoAI paper; KSEA SWRC, CSU Fullerton, Two research posters, Jan. 2026; SoCal Regional ICPC, With the CBU team, Nov. 2024"></picture>
 
 <picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/plate-bench-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/plate-bench-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/plate-bench-dark.svg"><img src="assets/plate-bench-light.svg" width="100%" alt="Robots &amp; hardware: SO-101 arm, Physical AI capstone: assembly and teleoperation; Reachy Mini, Assembled and demoed for visiting students; Jetson Orin Nano Super, A fully local AI assistant on the edge"></picture>
 
+</details>
+
 ## Timeline
 
-<picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/timeline-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/timeline-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/timeline-dark.svg"><img src="assets/timeline-light.svg" width="100%" alt="Fig. 9. Timeline of research, work and leadership from 2024 to now."></picture>
+<picture><source media="(max-width: 640px) and (prefers-color-scheme: dark)" srcset="assets/timeline-m-dark.svg"><source media="(max-width: 640px)" srcset="assets/timeline-m-light.svg"><source media="(prefers-color-scheme: dark)" srcset="assets/timeline-dark.svg"><img src="assets/timeline-light.svg" width="100%" alt="Fig. 5. Timeline of research, work and leadership from 2024 to now."></picture>
 
 ## Publications & talks
 

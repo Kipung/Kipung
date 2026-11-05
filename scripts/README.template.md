@@ -17,7 +17,7 @@
 
 {figures}
 
-### More from the lab
+### More projects
 
 {minis}
 
@@ -25,24 +25,25 @@
 
 <table>
   <tr>
-    <td width="50%"><a href="https://github.com/kipung/living-kanto"><img src="assets/demos/kanto.gif" width="100%" alt="Living Kanto replay: residents walk through town, each deciding where to go next"></a></td>
-    <td width="50%"><img src="assets/demos/lensing.gif" width="100%" alt="Gravitational lensing simulation: light rays bend as they reach rows of masses"></td>
+    <td width="33%"><a href="https://github.com/kipung/living-kanto"><img src="assets/demos/kanto.gif" width="100%" alt="Living Kanto replay: residents walk through town, each deciding where to go next"></a></td>
+    <td width="34%"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="terminal-browser: an agent in a Ghostty pane reads, restyles, fills in and clicks a page in the browser split beside it"></a></td>
+    <td width="33%"><img src="assets/demos/lensing.gif" width="100%" alt="Gravitational lensing simulation: light rays bend as they reach rows of masses"></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Living Kanto</b> · one decision at a time</sub></td>
-    <td align="center"><sub><b>Gravitational lensing</b> · computational physics research</sub></td>
-  </tr>
-  <tr>
-    <td colspan="2"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="terminal-browser: commands in the left pane drive a live browser split in Ghostty showing kipung.github.io"></a></td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center"><sub><b>Terminal Browser Split</b> · commands on the left drive a live browser on the right</sub></td>
+    <td align="center"><sub><b>Living Kanto</b> · 100 local-LLM residents</sub></td>
+    <td align="center"><sub><b>Terminal Browser</b> · an agent drives a live page</sub></td>
+    <td align="center"><sub><b>Gravitational lensing</b> · physics research</sub></td>
   </tr>
 </table>
 
 ## Photos
 
+<details>
+<summary><b>Conferences, competitions, robots and hardware</b></summary>
+
 {plates}
+
+</details>
 
 ## Timeline
 

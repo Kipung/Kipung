@@ -63,22 +63,22 @@ FIGURES = [
     {"slug": "geoai", "title": "GeoAI: Overdose Risk Mapping", "meta": "AMCIS 2025 · coauthor", "image": "geoai.jpg",
      "desc": "A deep model predicts areas of suspected drug-overdose risk from geolocated posts; Kepler.gl maps turn its output into regional insight.",
      "tags": "deep learning · GIS · Kepler.gl", "href": "https://aisel.aisnet.org/amcis2025/intelfuture/intelfuture/27/"},
-    {"slug": "hydro", "title": "Rainfall Transfer Between Gauges", "meta": "Hydrology · SCCUR 2026", "image": "hydro.jpg", "fit": "meet",
-     "desc": "Hourly rainfall from one gauge estimated from another across 28 years of records; held-out event hours reach R² = 0.58.",
-     "tags": "Python · time series · lagged OLS"},
-    {"slug": "degree", "title": "AI Degree Planning Companion", "meta": "CBU Office of Student Success", "image": "degree.jpg", "fit": "meet",
-     "desc": "An agent that plans courses over a Neo4j prerequisite graph, on local models, streamed to a React chat UI.",
-     "tags": "LangChain · Neo4j · FastAPI · Ollama · React", "href": "https://github.com/kipung/degree_planning_guide"},
-    {"slug": "browser", "title": "Terminal Browser Split", "meta": "Open source · dev tool", "image": "draw:terminal",
-     "desc": "A live, clickable browser preview in a native terminal split, opened by you with a hotkey or by any coding agent with one command.",
-     "tags": "Ghostty · kitty · WezTerm · tmux", "href": "https://github.com/kipung/terminal-browser"},
-    {"slug": "acm", "title": "CBU ACM Website", "meta": "ACM SET · team project", "image": "acm.jpg",
-     "desc": "Built by the Software Engineering Team I founded, with Brandon Magana and the SET crew, using Scrum and GitHub flow.",
-     "tags": "HTML · CSS · JavaScript · Scrum", "href": "https://github.com/kipung/SET_PROJECT_3"},
 ]
 
-# Smaller cards, shown two per row.
+# Smaller cards, two per row. The first four show; the rest sit behind "More projects".
 MINIS = [
+    {"slug": "degree", "title": "AI Degree Planning Companion", "meta": "Student Success", "image": "degree.jpg", "fit": "meet",
+     "desc": "An agent that plans courses over a Neo4j prerequisite graph, on local models, streamed to a React chat UI.",
+     "tags": "LangChain · Neo4j · FastAPI · Ollama · React", "href": "https://github.com/kipung/degree_planning_guide"},
+    {"slug": "browser", "title": "Terminal Browser Split", "meta": "Dev tool", "image": "draw:terminal",
+     "desc": "A live, clickable browser preview in a native terminal split, opened by you with a hotkey or by any coding agent with one command.",
+     "tags": "Ghostty · kitty · WezTerm · tmux", "href": "https://github.com/kipung/terminal-browser"},
+    {"slug": "hydro", "title": "Rainfall Transfer Between Gauges", "meta": "SCCUR 2026", "image": "hydro.jpg", "fit": "meet",
+     "desc": "Hourly rainfall from one gauge estimated from another across 28 years of records; held-out event hours reach R² = 0.58.",
+     "tags": "Python · time series · lagged OLS"},
+    {"slug": "acm", "title": "CBU ACM Website", "meta": "Team project", "image": "acm.jpg",
+     "desc": "Built by the Software Engineering Team I founded, with Brandon Magana and the SET crew, using Scrum and GitHub flow.",
+     "tags": "HTML · CSS · JavaScript · Scrum", "href": "https://github.com/kipung/SET_PROJECT_3"},
     {"slug": "tracr", "title": "Tracr → TransformerLens", "meta": "Algoverse · 2025", "image": "tracr.jpg", "fit": "meet",
      "desc": "Compile a RASP program with Tracr, convert it to TransformerLens, check both decode alike.",
      "href": "https://github.com/kipung/tracr_to_transformer_lens_generalize"},
@@ -282,7 +282,7 @@ def timeline(t):
     row_h, top = 30, 70
     H = top + len(TIMELINE) * row_h + 104
     lane_color = {"research": t["accent"], "work": t["ink"], "lead": t["dim"]}
-    out = [f'<text x="0" y="24" class="s ink" font-size="20"><tspan class="acc" font-weight="700">Fig. 9.</tspan> <tspan font-style="italic">Research, work and leadership, 2024 to now.</tspan></text>',
+    out = [f'<text x="0" y="24" class="s ink" font-size="20"><tspan class="acc" font-weight="700">Fig. 5.</tspan> <tspan font-style="italic">Research, work and leadership, 2024 to now.</tspan></text>',
            f'<rect x="0" y="36" width="{W}" height="1" fill="{t["rule"]}"/>']
     for yr in range(2024, end[0] + 1):
         x = X((yr, 1))
@@ -498,7 +498,7 @@ def timeline_m(t):
     lane_color = {"research": t["accent"], "work": t["ink"], "lead": t["dim"]}
     bottom = top + len(TIMELINE) * row_h
     out = ["<style>@keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }</style>",
-           f'<text x="0" y="28" class="s ink" font-size="23"><tspan class="acc" font-weight="700">Fig. 9.</tspan> <tspan font-style="italic">Research, work and leadership,</tspan></text>',
+           f'<text x="0" y="28" class="s ink" font-size="23"><tspan class="acc" font-weight="700">Fig. 5.</tspan> <tspan font-style="italic">Research, work and leadership,</tspan></text>',
            f'<text x="0" y="56" class="s ink" font-size="23" font-style="italic">2024 to now.</text>',
            f'<rect x="0" y="70" width="{W}" height="1" fill="{t["rule"]}"/>']
     for yr in range(2024, end[0] + 1):
@@ -550,12 +550,14 @@ def readme():
     figs = "\n".join(link(p.get("href"), picture_md(f"fig-{p['slug']}", f"Fig. {i}. {p['title']}: {p['desc']}"))
                      for i, p in enumerate(FIGURES, 1))
     minis = [link(p.get("href"), picture_md(f"mini-{p['slug']}", f"{p['title']}: {p['desc']}", "49%")) for p in MINIS]
-    mini_rows = "\n\n".join("<p>\n" + "\n".join(minis[i:i + 2]) + "\n</p>" for i in range(0, len(minis), 2))
+    rows = lambda ms: "\n\n".join("<p>\n" + "\n".join(ms[i:i + 2]) + "\n</p>" for i in range(0, len(ms), 2))
+    mini_rows = (rows(minis[:4]) + f"\n\n<details>\n<summary><b>{len(minis) - 4} more projects</b></summary>\n\n"
+                 + rows(minis[4:]) + "\n\n</details>")
     plates = "\n\n".join(picture_md(f"plate-{pl['slug']}", f"{pl['title']}: " + "; ".join(f"{a}, {c}" for _, a, c, _ in pl["photos"]))
                           for pl in PLATES)
     return (ROOT / "scripts" / "README.template.md").read_text(encoding="utf-8").format(
         hero=picture_md("hero", f"{NAME}. {SUBTITLE}"), figures=figs, minis=mini_rows, plates=plates,
-        timeline=picture_md("timeline", "Fig. 9. Timeline of research, work and leadership from 2024 to now."))
+        timeline=picture_md("timeline", "Fig. 5. Timeline of research, work and leadership from 2024 to now."))
 
 
 def write(path, text):
