@@ -7,32 +7,38 @@
   <a href="https://kipung.github.io/files/kip-park-cv.pdf"><b>CV</b></a> &nbsp;·&nbsp;
   <a href="https://www.linkedin.com/in/kip-park"><b>LinkedIn</b></a> &nbsp;·&nbsp;
   <a href="mailto:nankipung@gmail.com"><b>Email</b></a> &nbsp;·&nbsp;
-  <a href="https://aisel.aisnet.org/amcis2025/intelfuture/intelfuture/27/"><b>AMCIS 2025 paper</b></a> &nbsp;·&nbsp;
   <a href="#publications--talks"><b>Publications</b></a>
 </p>
 
-**Now:** building the CAIMLL lab's fine-tuning pipeline, leading a subliminal-learning study through revision, and studying rainfall estimation for flood prediction.
+**Now**
 
-## Figures
+- Building the CAIMLL lab's fine-tuning pipeline
+- Leading a subliminal-learning study (under review)
+- Studying rainfall estimation for flood prediction
 
-{figures}
-
-### More projects
-
-{minis}
-
-## In motion
+## Featured
 
 <table>
   <tr>
-    <td width="33%"><a href="https://github.com/kipung/living-kanto"><img src="assets/demos/kanto.gif" width="100%" alt="Living Kanto replay: residents walk through town, each deciding where to go next"></a></td>
-    <td width="34%"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="Claude Code gets a plain-English request, edits the page, then reloads, fills in and clicks it in the terminal-browser split beside it"></a></td>
-    <td width="33%"><img src="assets/demos/lensing.gif" width="100%" alt="Gravitational lensing simulation: light rays bend as they reach rows of masses"></td>
+    <td width="50%"><a href="https://github.com/kipung/living-kanto"><img src="assets/demos/kanto.gif" width="100%" alt="Living Kanto replay: residents walk through town, each deciding where to go next"></a></td>
+    <td width="50%"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="Claude Code gets a plain-English request, edits the page, then reloads, fills in and clicks it in the terminal-browser split beside it"></a></td>
   </tr>
   <tr>
-    <td align="center"><sub><b>Living Kanto</b> · 100 local-LLM residents</sub></td>
-    <td align="center"><sub><b>Terminal Browser</b> · Claude Code drives a live page</sub></td>
-    <td align="center"><sub><b>Gravitational lensing</b> · physics research</sub></td>
+    <td><b>Living Kanto</b><br>100 residents, each run by a local LLM, living in a persistent world.</td>
+    <td><b>Terminal Browser</b><br>Claude Code drives a live page in a split beside your terminal.</td>
+  </tr>
+</table>
+
+{featured}
+
+### More projects
+
+{projects}
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/demos/lensing.gif" width="100%" alt="Gravitational lensing simulation: light rays bend as they reach rows of masses"></td>
+    <td width="50%"><b>Gravitational lensing</b><br>A physics research simulation of light rays bending around rows of masses.</td>
   </tr>
 </table>
 
@@ -41,11 +47,11 @@
 <details>
 <summary><b>Conferences, competitions, robots and hardware</b></summary>
 
-{plates}
+{photos}
 
 </details>
 
-## Timeline
+## Experience
 
 {timeline}
 
