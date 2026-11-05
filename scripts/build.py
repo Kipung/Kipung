@@ -538,9 +538,13 @@ PHONE = "(max-width: 640px)"
 
 
 def picture_md(stem, alt, width="100%", base="assets/"):
-    """Light and dark artwork, each with a phone version for narrow screens."""
-    return (f'<picture><source media="{PHONE} and (prefers-color-scheme: dark)" srcset="{base}{stem}-m-dark.svg">'
-            f'<source media="{PHONE}" srcset="{base}{stem}-m-light.svg">'
+    """Light and dark artwork, plus a phone version for narrow screens.
+
+    GitHub rewrites any media query that mentions prefers-color-scheme so it matches the
+    viewer's GitHub theme, dropping the rest of the query. So the phone source must not
+    mention a color scheme: phones get the light phone version in either theme.
+    """
+    return (f'<picture><source media="{PHONE}" srcset="{base}{stem}-m-light.svg">'
             f'<source media="(prefers-color-scheme: dark)" srcset="{base}{stem}-dark.svg">'
             f'<img src="{base}{stem}-light.svg" width="{width}" alt="{escape(alt, {chr(34): "&quot;"})}"></picture>')
 
@@ -569,23 +573,29 @@ if __name__ == "__main__":
     by_slug = {p["slug"]: p for p in FIGURES + MINIS}
     for name, t in THEMES.items():
         write(OUT / f"hero-{name}.svg", hero(t))
-        write(OUT / f"hero-m-{name}.svg", hero_m(t))
+        if name == "light":
+            write(OUT / f"hero-m-{name}.svg", hero_m(t))
         write(OUT / f"timeline-{name}.svg", timeline(t))
-        write(OUT / f"timeline-m-{name}.svg", timeline_m(t))
+        if name == "light":
+            write(OUT / f"timeline-m-{name}.svg", timeline_m(t))
         for i, p in enumerate(FIGURES, 1):
             write(OUT / f"fig-{p['slug']}-{name}.svg", card(p, i, i % 2 == 0, t))
-            write(OUT / f"fig-{p['slug']}-m-{name}.svg", card_m(p, i, t))
+            if name == "light":
+                write(OUT / f"fig-{p['slug']}-m-{name}.svg", card_m(p, i, t))
         for p in MINIS:
             write(OUT / f"mini-{p['slug']}-{name}.svg", mini(p, t))
-            write(OUT / f"mini-{p['slug']}-m-{name}.svg", mini_m(p, t))
+            if name == "light":
+                write(OUT / f"mini-{p['slug']}-m-{name}.svg", mini_m(p, t))
         for pl in PLATES:
             write(OUT / f"plate-{pl['slug']}-{name}.svg", plate(pl, t))
-            write(OUT / f"plate-{pl['slug']}-m-{name}.svg", plate_m(pl, t))
+            if name == "light":
+                write(OUT / f"plate-{pl['slug']}-m-{name}.svg", plate_m(pl, t))
         for r in REPOS:
             p = dict(by_slug[r.get("fig") or r["mini"]])
             p["tags"] = r.get("tags") or p["tags"]
             header = (f"kipung / {r['repo']}", p["meta"])
             write(REPO_OUT / r["repo"] / ".github" / f"banner-{name}.svg", card(p, None, False, t, header=header))
-            write(REPO_OUT / r["repo"] / ".github" / f"banner-m-{name}.svg", card_m(p, None, t, header=header))
+            if name == "light":
+                write(REPO_OUT / r["repo"] / ".github" / f"banner-m-{name}.svg", card_m(p, None, t, header=header))
     write(ROOT / "README.md", readme())
     print("wrote", len(list(OUT.glob("*.svg"))), "profile SVGs and", len(REPOS) * 2, "repo banners")
