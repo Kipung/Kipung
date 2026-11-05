@@ -52,6 +52,12 @@
     <td align="center"><sub><b>Living Kanto</b> · one decision at a time</sub></td>
     <td align="center"><sub><b>Gravitational lensing</b> · computational physics research</sub></td>
   </tr>
+  <tr>
+    <td colspan="2"><a href="https://github.com/kipung/terminal-browser"><img src="assets/demos/terminal-browser.gif" width="100%" alt="terminal-browser: commands in the left pane drive a live browser split in Ghostty showing kipung.github.io"></a></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><sub><b>Terminal Browser Split</b> · commands on the left drive a live browser on the right</sub></td>
+  </tr>
 </table>
 
 ## Photos
