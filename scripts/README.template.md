@@ -3,6 +3,8 @@
 {hero}
 
 <p align="center">
+  <a href="https://kipung.github.io"><b>Website</b></a> &nbsp;·&nbsp;
+  <a href="https://kipung.github.io/files/kip-park-cv.pdf"><b>CV</b></a> &nbsp;·&nbsp;
   <a href="https://www.linkedin.com/in/kip-park"><b>LinkedIn</b></a> &nbsp;·&nbsp;
   <a href="mailto:nankipung@gmail.com"><b>Email</b></a> &nbsp;·&nbsp;
   <a href="https://aisel.aisnet.org/amcis2025/intelfuture/intelfuture/27/"><b>AMCIS 2025 paper</b></a> &nbsp;·&nbsp;

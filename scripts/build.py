@@ -317,10 +317,18 @@ def timeline(t):
     return svg(W, H, "Timeline of research, work and leadership from 2024 to now. " + "; ".join(l for _, l, _, _ in TIMELINE), t, "".join(out))
 
 
-def hero(t):
-    W, H = 1000, 470
-    fx, fy, fw, fh = 640, 104, 312, 210
+HERO_STYLE = """<style>
+  @keyframes draw { 0% { stroke-dashoffset: 1 } 55%, 92% { stroke-dashoffset: 0; opacity: 1 } 100% { stroke-dashoffset: 0; opacity: 0 } }
+  @keyframes pop { 0%, 1% { opacity: 0 } 2%, 92% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+  .r1 { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }
+  .r2 { animation: rise .8s .15s cubic-bezier(.2,.7,.2,1) both; }
+  .ln { fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 9s .4s ease-out infinite; }
+</style>"""
 
+
+def loss_chart(fx, fy, fw, fh, t, k=1.0):
+    """Fig. 0: a schematic fine-tune settling. k scales the labels."""
     def curve(pts):
         return " ".join(f"{'M' if i == 0 else 'L'}{fx + px * fw:.1f},{fy + (1 - py) * fh:.1f}" for i, (px, py) in enumerate(pts))
 
@@ -328,20 +336,26 @@ def hero(t):
     evals = [(i / 24, 0.2 + 0.72 * (0.5 ** (i / 3.6))) for i in range(0, 25, 3)]
     ticks = "".join(f'<rect x="{fx + fw * i / 4:.1f}" y="{fy + fh}" width="1" height="5" fill="{t["rule"]}"/>' for i in range(5))
     dots = "".join(
-        f'<circle cx="{fx + px * fw:.1f}" cy="{fy + (1 - py) * fh:.1f}" r="3" fill="{t["paper"]}" stroke="{t["ink"]}" stroke-width="1.4" '
+        f'<circle cx="{fx + px * fw:.1f}" cy="{fy + (1 - py) * fh:.1f}" r="{3 * k:.1f}" fill="{t["paper"]}" stroke="{t["ink"]}" stroke-width="1.4" '
         f'style="animation: pop 9s {0.8 + px * 4.2:.2f}s linear infinite both"/>' for px, py in evals)
+    return f"""<rect x="{fx}" y="{fy}" width="1" height="{fh}" fill="{t['rule']}"/><rect x="{fx}" y="{fy + fh}" width="{fw}" height="1" fill="{t['rule']}"/>
+{ticks}
+<path d="{curve(train)}" class="ln" pathLength="1" stroke="{t['accent']}" stroke-width="{2.2 * k:.1f}" stroke-linejoin="round"/>
+{dots}
+<path d="{curve(evals)}" fill="none" stroke="{t['ink']}" stroke-width="1" stroke-dasharray="3 4" opacity=".55"/>
+<text x="{fx + fw}" y="{fy + 6 * k:.0f}" class="m" font-size="{11 * k:.1f}" fill="{t['accent']}" text-anchor="end">— train loss</text>
+<text x="{fx + fw}" y="{fy + 22 * k:.0f}" class="m dim" font-size="{11 * k:.1f}" text-anchor="end">○ eval loss</text>
+<text x="{fx}" y="{fy + fh + 26 * k:.0f}" class="m dim" font-size="{11 * k:.1f}">steps →</text>
+<text x="{fx}" y="{fy + fh + 50 * k:.0f}" class="s ink" font-size="{14 * k:.1f}"><tspan font-weight="700">Fig. 0.</tspan> <tspan font-style="italic">A fine-tune settling (schematic).</tspan></text>"""
+
+
+def hero(t):
+    W, H = 1000, 470
     facts = "".join(
         f'<text x="{48 + i * 318}" y="{H - 50}" class="m cap acc">{escape(k)}</text>'
         f'<text x="{48 + i * 318}" y="{H - 26}" class="s ink" font-size="17">{escape(v)}</text>' for i, (k, v) in enumerate(FACTS))
     abstract = "".join(f'<text x="48" y="{300 + i * 25}" class="s ink" font-size="17">{escape(l)}</text>' for i, l in enumerate(ABSTRACT))
-    body = f"""<style>
-  @keyframes draw {{ 0% {{ stroke-dashoffset: 1 }} 55%, 92% {{ stroke-dashoffset: 0; opacity: 1 }} 100% {{ stroke-dashoffset: 0; opacity: 0 }} }}
-  @keyframes pop {{ 0%, 1% {{ opacity: 0 }} 2%, 92% {{ opacity: 1 }} 100% {{ opacity: 0 }} }}
-  @keyframes rise {{ from {{ opacity: 0; transform: translateY(10px) }} to {{ opacity: 1; transform: none }} }}
-  .r1 {{ animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }}
-  .r2 {{ animation: rise .8s .15s cubic-bezier(.2,.7,.2,1) both; }}
-  .ln {{ fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 9s .4s ease-out infinite; }}
-</style>
+    body = f"""{HERO_STYLE}
 <text x="48" y="40" class="m cap ink">Park, K.-P. · California Baptist University</text>
 <text x="{W - 48}" y="40" class="m cap dim" text-anchor="end">Riverside, CA · {TODAY.year}</text>
 <rect x="48" y="54" width="{W - 96}" height="1" fill="{t['ink']}"/><rect x="48" y="58" width="{W - 96}" height="1" fill="{t['ink']}"/>
@@ -349,23 +363,186 @@ def hero(t):
 <text x="48" y="204" class="s acc r2" font-size="22" font-style="italic">{escape(SUBTITLE)}</text>
 <text x="48" y="266" class="s ink" font-size="15" font-weight="700" letter-spacing=".04em">Abstract</text>
 {abstract}
-<rect x="{fx}" y="{fy}" width="1" height="{fh}" fill="{t['rule']}"/><rect x="{fx}" y="{fy + fh}" width="{fw}" height="1" fill="{t['rule']}"/>
-{ticks}
-<path d="{curve(train)}" class="ln" pathLength="1" stroke="{t['accent']}" stroke-width="2.2" stroke-linejoin="round"/>
-{dots}
-<path d="{curve(evals)}" fill="none" stroke="{t['ink']}" stroke-width="1" stroke-dasharray="3 4" opacity=".55"/>
-<text x="{fx + fw}" y="{fy + 6}" class="m" font-size="11" fill="{t['accent']}" text-anchor="end">— train loss</text>
-<text x="{fx + fw}" y="{fy + 22}" class="m dim" font-size="11" text-anchor="end">○ eval loss</text>
-<text x="{fx}" y="{fy + fh + 26}" class="m dim" font-size="11">steps →</text>
-<text x="{fx}" y="{fy + fh + 50}" class="s ink" font-size="14"><tspan font-weight="700">Fig. 0.</tspan> <tspan font-style="italic">A fine-tune settling (schematic).</tspan></text>
+{loss_chart(640, 104, 312, 210, t)}
 <rect x="48" y="{H - 84}" width="{W - 96}" height="1" fill="{t['rule']}"/>
 {facts}"""
     return svg(W, H, f"{NAME}. {SUBTITLE}", t, body)
 
 
-def picture_md(stem, alt, width="100%"):
-    return (f'<picture><source media="(prefers-color-scheme: dark)" srcset="assets/{stem}-dark.svg">'
-            f'<img src="assets/{stem}-light.svg" width="{width}" alt="{escape(alt, {chr(34): "&quot;"})}"></picture>')
+# Phone versions: one column, about twice the type size. GitHub shows them when the
+# screen is 640px wide or less (see picture_md). W = 480 shows at roughly 0.75x on a phone.
+MW = 480
+
+
+def hero_m(t):
+    W = MW
+    abstract = lines(0, 280, " ".join(ABSTRACT), 42, 19, "s ink", 28)
+    n_abs = len(textwrap.wrap(" ".join(ABSTRACT), 42))
+    fy = 280 + n_abs * 28 + 40
+    fh = 190
+    y = fy + fh + 100
+    facts = "".join(
+        f'<text x="0" y="{y + 34 + i * 64}" class="m acc" font-size="14" letter-spacing=".14em">{escape(k.upper())}</text>'
+        f'<text x="0" y="{y + 60 + i * 64}" class="s ink" font-size="21">{escape(v)}</text>' for i, (k, v) in enumerate(FACTS))
+    H = y + 34 + len(FACTS) * 64
+    body = f"""{HERO_STYLE}
+<text x="0" y="26" class="m ink" font-size="14" letter-spacing=".14em">PARK, K.-P. · CBU</text>
+<text x="{W - 2}" y="26" class="m dim" font-size="14" letter-spacing=".14em" text-anchor="end">RIVERSIDE · {TODAY.year}</text>
+<rect x="0" y="40" width="{W}" height="1" fill="{t['ink']}"/><rect x="0" y="44" width="{W}" height="1" fill="{t['ink']}"/>
+<text x="-2" y="118" class="s ink r1" font-size="47" letter-spacing="-1">{escape(NAME)}</text>
+{lines(0, 164, SUBTITLE, 36, 23, "s acc r2", 31, italic=True)}
+<text x="0" y="250" class="s ink" font-size="18" font-weight="700" letter-spacing=".04em">Abstract</text>
+{abstract}
+{loss_chart(6, fy, W - 10, fh, t, 1.35)}
+<rect x="0" y="{y}" width="{W}" height="1" fill="{t['rule']}"/>
+{facts}"""
+    return svg(W, H, f"{NAME}. {SUBTITLE}", t, body)
+
+
+def card_m(p, num, t, header=None):
+    """Phone version of card(): picture on top, caption below."""
+    W = MW
+    out, y = [], 0
+    if header:
+        out.append(f'<text x="0" y="22" class="m ink" font-size="15" letter-spacing=".08em">{escape(header[0])}</text>'
+                   f'<text x="0" y="46" class="m dim" font-size="14" letter-spacing=".1em">{escape(header[1].upper())}</text>'
+                   f'<rect x="0" y="60" width="{W}" height="1" fill="{t["ink"]}"/><rect x="0" y="64" width="{W}" height="1" fill="{t["ink"]}"/>')
+        y = 78
+    else:
+        out.append(f'<rect x="0" y="0" width="{W}" height="1" fill="{t["rule"]}"/>')
+        y = 12
+    ih = 300
+    out.append(picture(p, 0, y, W, ih, t))
+    y += ih + 36
+    label = f"Fig. {num}" if num else "Repository"
+    if not header:
+        out.append(f'<text x="0" y="{y}" class="m acc" font-size="16" font-weight="700">{label}</text>'
+                   f'<text x="{W - 2}" y="{y}" class="m dim" font-size="13" letter-spacing=".1em" text-anchor="end">{escape(p["meta"].upper())}</text>')
+        y += 46
+    else:
+        y += 4
+    tl = textwrap.wrap(p["title"], 24)
+    out.append(lines(0, y, p["title"], 24, 34, "s ink", 40))
+    y += (len(tl) - 1) * 40 + 44
+    dl = textwrap.wrap(p["desc"], 43)
+    out.append(lines(0, y, p["desc"], 43, 21, "s ink", 30, italic=True))
+    y += (len(dl) - 1) * 30 + 34
+    out.append(f'<rect x="0" y="{y}" width="48" height="1.5" fill="{t["accent"]}"/>')
+    y += 30
+    gl = textwrap.wrap(p["tags"], 46)
+    out.append(lines(0, y, p["tags"], 46, 16, "m dim", 24))
+    y += (len(gl) - 1) * 24
+    if p.get("href") and not header:
+        y += 34
+        out.append(f'<text x="0" y="{y}" class="m acc" font-size="16">{escape(link_label(p))} →</text>')
+    return svg(W, y + 16, f'{label}. {p["title"]}: {p["desc"]}', t, "".join(out))
+
+
+def mini_m_height(p):
+    """Cards share a row two at a time, so each takes the height of the taller one in its row."""
+    i = MINIS.index(p) // 2 * 2
+    return max(mini_m_layout(q)[1] for q in MINIS[i:i + 2])
+
+
+def mini_m_layout(p):
+    tl, dl = textwrap.wrap(p["title"], 15), textwrap.wrap(p["desc"], 22)
+    y_title = 190 + 12 + 42
+    y_meta = y_title + (len(tl) - 1) * 34 + 32
+    y_desc = y_meta + 40
+    y_link = y_desc + (len(dl) - 1) * 30 + 44
+    return (y_title, y_meta, y_desc, y_link), y_link + 14
+
+
+def mini_m(p, t):
+    """Phone version of mini(): shown at half the screen width, so the type is large."""
+    W, H = 300, mini_m_height(p)
+    (y_title, y_meta, y_desc, y_link), _ = mini_m_layout(p)
+    body = (f'<rect x="0" y="0" width="{W}" height="1" fill="{t["rule"]}"/>'
+            + picture(p, 0, 12, W, 190, t, p.get("align", "xMidYMid"))
+            + lines(0, y_title, p["title"], 15, 30, "s ink", 34)
+            + f'<text x="0" y="{y_meta}" class="m dim" font-size="17" letter-spacing=".06em">{escape(p["meta"])}</text>'
+            + lines(0, y_desc, p["desc"], 22, 21, "s ink", 30, italic=True)
+            + (f'<text x="0" y="{y_link}" class="m acc" font-size="18">on GitHub →</text>' if p.get("href") else ""))
+    return svg(W, H, f'{p["title"]}: {p["desc"]}', t, body)
+
+
+def plate_m(pl, t):
+    """Phone version of plate(): one wide photo, then two side by side."""
+    W = MW
+    (a, *rest) = pl["photos"]
+    out = [f'<text x="0" y="28" class="s ink" font-size="25" font-weight="700">{escape(pl["title"])}</text>',
+           f'<rect x="0" y="42" width="{W}" height="1" fill="{t["rule"]}"/>']
+    out.append(picture({"image": a[0]}, 0, 56, W, 320, t, a[3])
+               + f'<text x="0" y="{56 + 320 + 32}" class="s ink" font-size="21" font-weight="700">{escape(a[1])}</text>'
+               + f'<text x="0" y="{56 + 320 + 60}" class="s dim" font-size="19" font-style="italic">{escape(a[2])}</text>')
+    y0, cw, ch = 56 + 320 + 92, (W - 20) // 2, 290
+    deepest = 0
+    for i, (img, title, note, align) in enumerate(rest):
+        x = i * (cw + 20)
+        tl, nl = textwrap.wrap(title, 19), textwrap.wrap(note, 22)
+        out.append(picture({"image": img}, x, y0, cw, ch, t, align)
+                   + lines(x, y0 + ch + 32, title, 19, 20, "s ink", 26).replace('class="s ink"', 'class="s ink" font-weight="700"')
+                   + lines(x, y0 + ch + 32 + len(tl) * 26 + 4, note, 22, 18, "s dim", 25, italic=True))
+        deepest = max(deepest, ch + 32 + len(tl) * 26 + 4 + (len(nl) - 1) * 25)
+    return svg(W, y0 + deepest + 16, f'{pl["title"]}: ' + "; ".join(f"{a}, {b}" for _, a, b, _ in pl["photos"]), t, "".join(out))
+
+
+def timeline_m(t):
+    """Phone version of timeline(): each label sits on its own line above its bar."""
+    W = MW
+    start = (2024, 1)
+    end = max((2027, 6), (NOW[0] + (NOW[1] + 6 - 1) // 12, (NOW[1] + 6 - 1) % 12 + 1))
+    mi = lambda ym: (ym[0] - start[0]) * 12 + ym[1] - 1
+    X = lambda ym: (W - 12) * mi(ym) / mi(end)
+    row_h, top = 50, 104
+    lane_color = {"research": t["accent"], "work": t["ink"], "lead": t["dim"]}
+    bottom = top + len(TIMELINE) * row_h
+    out = ["<style>@keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: .3 } }</style>",
+           f'<text x="0" y="28" class="s ink" font-size="23"><tspan class="acc" font-weight="700">Fig. 9.</tspan> <tspan font-style="italic">Research, work and leadership,</tspan></text>',
+           f'<text x="0" y="56" class="s ink" font-size="23" font-style="italic">2024 to now.</text>',
+           f'<rect x="0" y="70" width="{W}" height="1" fill="{t["rule"]}"/>']
+    for yr in range(2024, end[0] + 1):
+        x = X((yr, 1))
+        out.append(f'<rect x="{x:.1f}" y="{top - 12}" width="1" height="{bottom - top + 12}" fill="{t["rule"]}"/>'
+                   f'<text x="{x + 5:.1f}" y="{top - 2}" class="m dim" font-size="14">{yr}</text>')
+    nx = X(NOW)
+    out.append(f'<rect x="{nx:.1f}" y="{top - 12}" width="2" height="{bottom - top + 20}" fill="{t["accent"]}"/>'
+               f'<text x="{nx - 5:.1f}" y="{top - 2}" class="m acc" font-size="14" text-anchor="end">now</text>')
+    for i, (lane, label, a, b) in enumerate(TIMELINE):
+        y = top + 26 + i * row_h
+        x0, x1 = X(a), X(b or NOW)
+        c = lane_color[lane]
+        out.append(f'<text x="0" y="{y}" class="s ink" font-size="18">{escape(label)}</text>'
+                   f'<rect x="{x0:.1f}" y="{y + 7}" width="{max(x1 - x0, 5):.1f}" height="11" fill="{c}"/>')
+        if b is None:
+            out.append(f'<path d="M{x1:.1f},{y + 7} l8,5.5 l-8,5.5 z" fill="{c}" style="animation: pulse 2.4s ease-in-out infinite"/>')
+    my = bottom + 30
+    out.append(f'<rect x="0" y="{my}" width="{W - 12}" height="1" fill="{t["rule"]}"/>')
+    for j, (ym, label) in enumerate(MILESTONES):
+        x = X(ym)
+        anchor = "start" if x < 40 else ("end" if x > W - 60 else "middle")
+        out.append(f'<circle cx="{x:.1f}" cy="{my}" r="5" fill="{t["paper"]}" stroke="{t["accent"]}" stroke-width="1.8"/>'
+                   f'<text x="{x:.1f}" y="{my + 26 + (j % 3) * 20}" class="m dim" font-size="14" text-anchor="{anchor}">{escape(label)}</text>')
+    ky = my + 26 + 3 * 20 + 18
+    key = [("research", "Research"), ("work", "Work"), ("lead", "Leadership & teaching")]
+    kx = 0
+    for lane, label in key:
+        out.append(f'<rect x="{kx}" y="{ky - 11}" width="12" height="12" fill="{lane_color[lane]}"/>'
+                   f'<text x="{kx + 18}" y="{ky}" class="m dim" font-size="14">{escape(label)}</text>')
+        kx += 18 + len(label) * 8.6 + 22
+    out.append(f'<text x="0" y="{ky + 28}" class="m dim" font-size="14">○ talks, papers, awards</text>')
+    return svg(W, ky + 40, "Timeline of research, work and leadership from 2024 to now. " + "; ".join(l for _, l, _, _ in TIMELINE), t, "".join(out))
+
+
+PHONE = "(max-width: 640px)"
+
+
+def picture_md(stem, alt, width="100%", base="assets/"):
+    """Light and dark artwork, each with a phone version for narrow screens."""
+    return (f'<picture><source media="{PHONE} and (prefers-color-scheme: dark)" srcset="{base}{stem}-m-dark.svg">'
+            f'<source media="{PHONE}" srcset="{base}{stem}-m-light.svg">'
+            f'<source media="(prefers-color-scheme: dark)" srcset="{base}{stem}-dark.svg">'
+            f'<img src="{base}{stem}-light.svg" width="{width}" alt="{escape(alt, {chr(34): "&quot;"})}"></picture>')
 
 
 def readme():
@@ -390,17 +567,23 @@ if __name__ == "__main__":
     by_slug = {p["slug"]: p for p in FIGURES + MINIS}
     for name, t in THEMES.items():
         write(OUT / f"hero-{name}.svg", hero(t))
+        write(OUT / f"hero-m-{name}.svg", hero_m(t))
         write(OUT / f"timeline-{name}.svg", timeline(t))
+        write(OUT / f"timeline-m-{name}.svg", timeline_m(t))
         for i, p in enumerate(FIGURES, 1):
             write(OUT / f"fig-{p['slug']}-{name}.svg", card(p, i, i % 2 == 0, t))
+            write(OUT / f"fig-{p['slug']}-m-{name}.svg", card_m(p, i, t))
         for p in MINIS:
             write(OUT / f"mini-{p['slug']}-{name}.svg", mini(p, t))
+            write(OUT / f"mini-{p['slug']}-m-{name}.svg", mini_m(p, t))
         for pl in PLATES:
             write(OUT / f"plate-{pl['slug']}-{name}.svg", plate(pl, t))
+            write(OUT / f"plate-{pl['slug']}-m-{name}.svg", plate_m(pl, t))
         for r in REPOS:
             p = dict(by_slug[r.get("fig") or r["mini"]])
             p["tags"] = r.get("tags") or p["tags"]
-            write(REPO_OUT / r["repo"] / ".github" / f"banner-{name}.svg",
-                  card(p, None, False, t, header=(f"kipung / {r['repo']}", p["meta"])))
+            header = (f"kipung / {r['repo']}", p["meta"])
+            write(REPO_OUT / r["repo"] / ".github" / f"banner-{name}.svg", card(p, None, False, t, header=header))
+            write(REPO_OUT / r["repo"] / ".github" / f"banner-m-{name}.svg", card_m(p, None, t, header=header))
     write(ROOT / "README.md", readme())
     print("wrote", len(list(OUT.glob("*.svg"))), "profile SVGs and", len(REPOS) * 2, "repo banners")

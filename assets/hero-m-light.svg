@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480" height="1004" viewBox="0 0 480 1004" role="img" aria-label="Ki-Pung (Kip) Park. Fine-tuning, evaluating, and running language models locally.">
+<style>
+  .s { font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; }
+  .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace; }
+  .ink { fill: #16181d; }
+  .dim { fill: #16181d99; }
+  .acc { fill: #2547d0; }
+  .cap { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+</style>
+<rect width="480" height="1004" fill="#faf8f3"/>
+<style>
+  @keyframes draw { 0% { stroke-dashoffset: 1 } 55%, 92% { stroke-dashoffset: 0; opacity: 1 } 100% { stroke-dashoffset: 0; opacity: 0 } }
+  @keyframes pop { 0%, 1% { opacity: 0 } 2%, 92% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+  .r1 { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }
+  .r2 { animation: rise .8s .15s cubic-bezier(.2,.7,.2,1) both; }
+  .ln { fill: none; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 9s .4s ease-out infinite; }
+</style>
+<text x="0" y="26" class="m ink" font-size="14" letter-spacing=".14em">PARK, K.-P. · CBU</text>
+<text x="478" y="26" class="m dim" font-size="14" letter-spacing=".14em" text-anchor="end">RIVERSIDE · 2026</text>
+<rect x="0" y="40" width="480" height="1" fill="#16181d"/><rect x="0" y="44" width="480" height="1" fill="#16181d"/>
+<text x="-2" y="118" class="s ink r1" font-size="47" letter-spacing="-1">Ki-Pung (Kip) Park</text>
+<text x="0" y="164" class="s acc r2" font-size="23" font-style="italic">Fine-tuning, evaluating, and running</text><text x="0" y="195" class="s acc r2" font-size="23" font-style="italic">language models locally.</text>
+<text x="0" y="250" class="s ink" font-size="18" font-weight="700" letter-spacing=".04em">Abstract</text>
+<text x="0" y="280" class="s ink" font-size="19">CS student (ML &amp; AI, ’27) at California</text><text x="0" y="308" class="s ink" font-size="19">Baptist University. I build source-</text><text x="0" y="336" class="s ink" font-size="19">verified fine-tuning pipelines, run</text><text x="0" y="364" class="s ink" font-size="19">controlled LLM experiments, and ship</text><text x="0" y="392" class="s ink" font-size="19">local-first AI tools that people actually</text><text x="0" y="420" class="s ink" font-size="19">use.</text>
+<rect x="6" y="488" width="1" height="190" fill="#16181d33"/><rect x="6" y="678" width="470" height="1" fill="#16181d33"/>
+<rect x="6.0" y="678" width="1" height="5" fill="#16181d33"/><rect x="123.5" y="678" width="1" height="5" fill="#16181d33"/><rect x="241.0" y="678" width="1" height="5" fill="#16181d33"/><rect x="358.5" y="678" width="1" height="5" fill="#16181d33"/><rect x="476.0" y="678" width="1" height="5" fill="#16181d33"/>
+<path d="M6.0,503.2 L25.6,528.6 L45.2,559.3 L64.8,579.5 L84.3,590.0 L103.9,608.8 L123.5,619.3 L143.1,622.1 L162.7,634.6 L182.2,640.1 L201.8,638.8 L221.4,648.1 L241.0,650.9 L260.6,647.5 L280.2,655.1 L299.8,656.6 L319.3,652.1 L338.9,658.8 L358.5,659.6 L378.1,654.5 L397.7,660.7 L417.2,661.1 L436.8,655.7 L456.4,661.7 L476.0,661.9" class="ln" pathLength="1" stroke="#2547d0" stroke-width="3.0" stroke-linejoin="round"/>
+<circle cx="6.0" cy="503.2" r="4.1" fill="#faf8f3" stroke="#16181d" stroke-width="1.4" style="animation: pop 9s 0.80s linear infinite both"/><circle cx="64.8" cy="563.2" r="4.1" fill="#faf8f3" stroke="#16181d" stroke-width="1.4" style="animation: pop 9s 1.33s linear infinite both"/><circle cx="123.5" cy="596.9" r="4.1" fill="#faf8f3" stroke="#16181d" stroke-width="1.4" style="animation: pop 9s 1.85s linear infinite both"/><circle cx="182.2" cy="615.8" r="4.1" fill="#faf8f3" stroke="#16181d" stroke-width="1.4" style="animation: pop 9s 2.38s linear infinite both"/><circle cx="241.0" cy="626.4" r="4.1" fill="#faf8f3" stroke="#16181d" stroke-width="1.4" style="animation: pop 9s 2.90s linear infinite both"/><circle cx="299.8" cy="632.4" r="4.1" fill="#faf8f3" stroke="#16181d" stroke-width="1.4" style="animation: pop 9s 3.42s linear infinite both"/><circle cx="358.5" cy="635.7" r="4.1" fill="#faf8f3" stroke="#16181d" stroke-width="1.4" style="animation: pop 9s 3.95s linear infinite both"/><circle cx="417.2" cy="637.6" r="4.1" fill="#faf8f3" stroke="#16181d" stroke-width="1.4" style="animation: pop 9s 4.48s linear infinite both"/><circle cx="476.0" cy="638.7" r="4.1" fill="#faf8f3" stroke="#16181d" stroke-width="1.4" style="animation: pop 9s 5.00s linear infinite both"/>
+<path d="M6.0,503.2 L64.8,563.2 L123.5,596.9 L182.2,615.8 L241.0,626.4 L299.8,632.4 L358.5,635.7 L417.2,637.6 L476.0,638.7" fill="none" stroke="#16181d" stroke-width="1" stroke-dasharray="3 4" opacity=".55"/>
+<text x="476" y="496" class="m" font-size="14.9" fill="#2547d0" text-anchor="end">— train loss</text>
+<text x="476" y="518" class="m dim" font-size="14.9" text-anchor="end">○ eval loss</text>
+<text x="6" y="713" class="m dim" font-size="14.9">steps →</text>
+<text x="6" y="746" class="s ink" font-size="18.9"><tspan font-weight="700">Fig. 0.</tspan> <tspan font-style="italic">A fine-tune settling (schematic).</tspan></text>
+<rect x="0" y="778" width="480" height="1" fill="#16181d33"/>
+<text x="0" y="812" class="m acc" font-size="14" letter-spacing=".14em">STUDY</text><text x="0" y="838" class="s ink" font-size="21">B.S. CS, ML &amp; AI · Apr. 2027</text><text x="0" y="876" class="m acc" font-size="14" letter-spacing=".14em">LAB</text><text x="0" y="902" class="s ink" font-size="21">CBU AI &amp; ML Lab (CAIMLL)</text><text x="0" y="940" class="m acc" font-size="14" letter-spacing=".14em">NEXT</text><text x="0" y="966" class="s ink" font-size="21">2 posters · SCCUR, Nov. 21</text>
+</svg>
