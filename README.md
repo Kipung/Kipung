@@ -97,11 +97,8 @@
 
 <sub><b>ML</b> PyTorch · JAX / Haiku · TransformerLens · Unsloth · LangChain &nbsp;·&nbsp; <b>Methods</b> LoRA / QLoRA · sparse autoencoders · evaluation · synthetic data &nbsp;·&nbsp; <b>Inference</b> Ollama · vLLM · GGUF &nbsp;·&nbsp; <b>Data</b> Neo4j · PostgreSQL · FAISS</sub>
 
-## Activity
+## Terminal
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/kipung/kipung/output/snake-dark.svg">
-  <img src="https://raw.githubusercontent.com/kipung/kipung/output/snake-light.svg" width="100%" alt="A snake eating the contribution graph">
-</picture>
+<img src="assets/terminal.svg" width="100%" alt="An animated terminal introducing Ki-Pung Park, research interests, and projects. Build. Test. Understand. Repeat." />
 
 <sub>Riverside, CA · Interests: LLM architectures, vision-language-action models, physical AI</sub>
