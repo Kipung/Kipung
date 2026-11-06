@@ -41,6 +41,11 @@
 </p>
 
 <p>
+<a href="https://github.com/kipung/Ground-Up-Trained-Transformer"><picture><source media="(max-width: 640px)" srcset="assets/proj-gutt-m.svg"><img src="assets/proj-gutt.svg" width="49%" alt="Ground-Up Transformer: A 19M-parameter character-level GPT written and trained from scratch on Tiny Shakespeare. It writes plays on a laptop CPU."></picture></a>
+<a href="https://github.com/kipung/AgentPulse"><picture><source media="(max-width: 640px)" srcset="assets/proj-agentpulse-m.svg"><img src="assets/proj-agentpulse.svg" width="49%" alt="AgentPulse: Tools for coding agents: agent-notifier tells you when a long task or agent turn finishes, agent-vitals tracks tokens, cost and context."></picture></a>
+</p>
+
+<p>
 <picture><source media="(max-width: 640px)" srcset="assets/proj-hydro-m.svg"><img src="assets/proj-hydro.svg" width="49%" alt="Rainfall Transfer Between Gauges: Hourly rainfall from one gauge estimated from another across 28 years of records; held-out event hours reach R² = 0.58."></picture>
 <picture><source media="(max-width: 640px)" srcset="assets/proj-lensing-m.svg"><img src="assets/proj-lensing.svg" width="49%" alt="Gravitational Lensing: A simulation of light rays bending as they pass rows of masses."></picture>
 </p>

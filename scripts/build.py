@@ -63,7 +63,8 @@ FEATURED = [
      "tags": "deep learning · GIS · Kepler.gl", "href": "https://aisel.aisnet.org/amcis2025/intelfuture/intelfuture/27/"},
 ]
 
-# Smaller cards, two per row. The first four show; the rest sit behind "More projects".
+# Smaller cards, two per row. The first VISIBLE show; the rest sit behind "More projects".
+VISIBLE = 6
 PROJECTS = [
     {"slug": "degree", "title": "AI Degree Planning Companion", "meta": "Student Success", "image": "degree.jpg", "fit": "meet",
      "desc": "An agent that plans courses over a Neo4j prerequisite graph, on local models, streamed to a React chat UI.",
@@ -71,6 +72,12 @@ PROJECTS = [
     {"slug": "browser", "title": "Terminal Browser Split", "meta": "Dev tool", "image": "draw:terminal",
      "desc": "A live, clickable browser preview in a native terminal split, opened by you with a hotkey or by any coding agent with one command.",
      "tags": "Ghostty · kitty · WezTerm · tmux", "href": "https://github.com/kipung/terminal-browser"},
+    {"slug": "gutt", "title": "Ground-Up Transformer", "meta": "From scratch · PyTorch", "image": "gutt.gif",
+     "desc": "A 19M-parameter character-level GPT written and trained from scratch on Tiny Shakespeare. It writes plays on a laptop CPU.",
+     "tags": "PyTorch · attention · Tiny Shakespeare", "href": "https://github.com/kipung/Ground-Up-Trained-Transformer"},
+    {"slug": "agentpulse", "title": "AgentPulse", "meta": "Dev tools · on PyPI", "image": "agent-notifier.gif",
+     "desc": "Tools for coding agents: agent-notifier tells you when a long task or agent turn finishes, agent-vitals tracks tokens, cost and context.",
+     "tags": "Python · Claude Code · Codex · CLI", "href": "https://github.com/kipung/AgentPulse"},
     {"slug": "hydro", "title": "Rainfall Transfer Between Gauges", "meta": "SCCUR 2026", "image": "hydro.jpg", "fit": "meet",
      "desc": "Hourly rainfall from one gauge estimated from another across 28 years of records; held-out event hours reach R² = 0.58.",
      "tags": "Python · time series · lagged OLS"},
@@ -298,7 +305,7 @@ def picture(p, x, y, w, h, align="xMidYMid", r=10):
         fit = p.get("fit", "slice")
         back = f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#ffffff"/>' if fit == "meet" else ""
         uri = embed(p["image"], int(w * 1.6))
-        inner = f'{back}<image x="{x}" y="{y}" width="{w}" height="{h}" preserveAspectRatio="{align} {fit}" href="{uri}" xlink:href="{uri}"/>'
+        inner = f'{back}<image x="{x}" y="{y}" width="{w}" height="{h}" preserveAspectRatio="{align} {fit}" href="{uri}"/>'
     return (f'{clip}<g clip-path="url(#{cid})">{inner}</g>'
             f'<rect x="{x + .5}" y="{y + .5}" width="{w - 1}" height="{h - 1}" rx="{r}" fill="none" stroke="{BORDER}"/>')
 
@@ -628,8 +635,8 @@ def readme():
                          for p in FEATURED if p.get("readme", True))
     minis = [link(p.get("href"), picture_md(f"proj-{p['slug']}", f"{p['title']}: {p['desc']}", "49%")) for p in PROJECTS]
     rows = lambda ms: "\n\n".join("<p>\n" + "\n".join(ms[i:i + 2]) + "\n</p>" for i in range(0, len(ms), 2))
-    more = (rows(minis[:4]) + f"\n\n<details>\n<summary><b>{len(minis) - 4} more projects</b></summary>\n\n"
-            + rows(minis[4:]) + "\n\n</details>")
+    more = (rows(minis[:VISIBLE]) + f"\n\n<details>\n<summary><b>{len(minis) - VISIBLE} more projects</b></summary>\n\n"
+            + rows(minis[VISIBLE:]) + "\n\n</details>")
     photos = "\n\n".join(picture_md(f"photos-{pl['slug']}", _plate_label(pl)) for pl in PLATES)
     return (ROOT / "scripts" / "README.template.md").read_text(encoding="utf-8").format(
         hero=picture_md("hero", f"{NAME}. {TAGLINE}"), featured=featured, projects=more, photos=photos,
